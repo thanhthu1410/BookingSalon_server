@@ -12,7 +12,7 @@ import * as dotenv from 'dotenv';
   JwtModule.register({
     global:true,
     secret:'123456',
-    signOptions:{expiresIn:"1h"} 
+    signOptions:{expiresIn:"60s"} 
   }),
   ConfigModule
 ],
