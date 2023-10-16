@@ -9,37 +9,91 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class VouchersService {
-  constructor(@InjectRepository(Voucher) private voucherSer : Repository<Voucher>){}
+  constructor(@InjectRepository(Voucher) private voucherSer: Repository<Voucher>) { }
   async create(data: CreateVoucherDto) {
-  console.log("data",data);
-  try{
-     let result = await this.voucherSer.save(data)
+    console.log("data", data);
+    try {
+      let result = await this.voucherSer.save(data)
       return {
         status: true,
         message: "create okey ",
         data: result
       }
-  }catch{
-    return {
-      status: false,
-      message: "create failed ",
-      data: null
+    } catch {
+      return {
+        status: false,
+        message: "create failed ",
+        data: null
+      }
     }
   }
+
+  async findAll() {
+    try {
+      let result = await this.voucherSer.find({
+        where: {
+          IsDelete: false
+        }
+      })
+      if (!result) return false
+      return { status: true, message: "Get Vouchers Successfully !", data: result }
+    } catch {
+      return {
+        status: false,
+        message: "Get Vouchers Failed",
+        data: null
+      }
+    }
   }
 
-  findAll() {
-    return `This action returns all vouchers`;
+  async findOne(id: number) {
+    try {
+      const result = await this.voucherSer.findOne({
+        where: {
+          id,
+        }
+      })
+      if (!result) return {
+        status: false,
+        data: null,
+        message: 'Not Found'
+      }
+      return {
+        status: true,
+        message: 'get one voucher successfully',
+        data: result
+      }
+    } catch {
+
+    }
+
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} voucher`;
+  async update(id: number) {
+   try{
+    const oldData = (await this.findOne(Number(id))).data
+    console.log("oldData",oldData);
+    
+    const newData = {
+      ...oldData,
+      IsDelete: true
+    }
+    console.log("newData",newData);
+    const resutl = await this.voucherSer.update(oldData, newData)
+   if(!resutl) return false
+   return {
+    status: true,
+    message: "Delete Successfull ",
+    data: resutl
+   }
+   }catch{
+    return {
+      status: false,
+      message: "Delete Faild ",
+      data: null
+     }
+   }
   }
-
-  update(id: number, updateVoucherDto: UpdateVoucherDto) {
-    return `This action updates a #${id} voucher`;
-  }
-
   remove(id: number) {
     return `This action removes a #${id} voucher`;
   }

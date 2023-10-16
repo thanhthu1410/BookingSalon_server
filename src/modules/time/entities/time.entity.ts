@@ -6,11 +6,17 @@ export class Time {
     id: number
 
     @Column()
-    startTime: number
+    startTime: string
 
     @Column()
-    endTime: number
+    endTime: string
 
     @Column()
     duration: number
+
+    @Column()
+    maxDate: number
+
+    @Column()
+    stepMinute: number
 }
