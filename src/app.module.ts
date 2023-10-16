@@ -12,6 +12,7 @@ import { StaffsModule } from './modules/staffs/staffs.module';
 import { StaffServicesModule } from './modules/staff-services/staff-services.module';
 import { UsersModule } from './modules/users/users.module';
 import { VouchersModule } from './modules/vouchers/vouchers.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { VouchersModule } from './modules/vouchers/vouchers.module';
       entities: ["dist/**/*.entity{.ts,.js}"],
       synchronize: true,
     }),
-    CustomersModule, ServicesModule, AppointmentsModule, TimeModule, AppointmentDetailsModule, StaffsModule, StaffServicesModule, UsersModule, VouchersModule],
+    CustomersModule, ServicesModule, AppointmentsModule, TimeModule, AppointmentDetailsModule, StaffsModule, StaffServicesModule, UsersModule, VouchersModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
