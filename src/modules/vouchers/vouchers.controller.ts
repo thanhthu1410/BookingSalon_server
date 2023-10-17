@@ -33,7 +33,9 @@ export class VouchersController {
         code: createVoucher,
         discountType: body.discountType,
         value: body.value,
-        title: body.title
+        title: body.title,
+        startAt: body.startAt,
+        endAt: body.endAt
       }
       arrayVoucher.push(formatVoucher)
     }

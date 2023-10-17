@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator"
+import { Allow, IsNotEmpty } from "class-validator"
 
 export class CreateVoucherDto {
     @IsNotEmpty()
@@ -12,6 +12,11 @@ export class CreateVoucherDto {
 
     @IsNotEmpty()
     discountType: string
+
+    
+    startAt: string
+    
+    endAt: string
     
 
 }
