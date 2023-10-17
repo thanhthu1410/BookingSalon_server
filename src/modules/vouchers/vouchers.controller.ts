@@ -47,13 +47,15 @@ export class VouchersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.vouchersService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVoucherDto: UpdateVoucherDto) {
-    return this.vouchersService.update(+id, updateVoucherDto);
+  update(@Param('id') id: number) {
+    console.log("id",id);
+    
+    return this.vouchersService.update(id);
   }
 
   @Delete(':id')

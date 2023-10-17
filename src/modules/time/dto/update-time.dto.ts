@@ -7,8 +7,14 @@ export class UpdateTimeDto extends PartialType(CreateTimeDto) {
     duration: number
 
     @Allow()
-    startTime: number
+    startTime: string
 
     @Allow()
-    endTime: number
+    endTime: string
+
+    @Allow()
+    maxDate: number
+
+    @Allow()
+    stepMinute: number
 }
