@@ -17,7 +17,6 @@ export class UsersController {
   @Get()
   async findAll() {
     const res = await this.usersService.findAll()
-    console.log("🚀 ~ file: users.controller.ts:20 ~ UsersController ~ findAll ~ res:", res)
     return res;
   }
 
