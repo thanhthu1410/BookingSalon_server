@@ -52,10 +52,10 @@ export class VouchersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: number) {
+  update(@Param('id') id: number, @Body() updateVoucherDto: UpdateVoucherDto) {
     console.log("id",id);
     
-    return this.vouchersService.update(id);
+    return this.vouchersService.update(id,updateVoucherDto);
   }
 
   @Delete(':id')

@@ -69,22 +69,23 @@ export class VouchersService {
 
   }
 
-  async update(id: number) {
+  async update(id: number,updateVoucherDto: UpdateVoucherDto) {
    try{
-    const oldData = (await this.findOne(Number(id))).data
+    const oldData = await this.voucherSer.findOne({
+      where:{
+        id
+      }
+    })
     console.log("oldData",oldData);
+    console.log("updateVoucherDto",updateVoucherDto);
     
-    const newData = {
-      ...oldData,
-      IsDelete: true
-    }
-    console.log("newData",newData);
-    const resutl = await this.voucherSer.update(oldData, newData)
+    const resutl = this.voucherSer.merge(oldData, updateVoucherDto)
+    const updateData = await this.voucherSer.save(resutl)
    if(!resutl) return false
    return {
     status: true,
     message: "Delete Successfull ",
-    data: resutl
+    data: updateData
    }
    }catch{
     return {
