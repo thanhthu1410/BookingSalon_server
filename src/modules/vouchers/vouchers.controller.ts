@@ -1,9 +1,10 @@
 import { async } from 'rxjs';
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, ParseIntPipe, HttpStatus, HttpException, Query } from '@nestjs/common';
 import { VouchersService } from './vouchers.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { Response } from "express"
+import { PaginationDto } from '../services/dto/pagination-service.dto';
 
 function generateRandomString(length: number) {
 
@@ -44,9 +45,20 @@ export class VouchersController {
       return res.status(voucherRes ? 200 : 213).json(voucherRes)
   }
   @Get()
-  findAll() {
-    return this.vouchersService.findAll();
+  async findAll(@Res() res: Response, @Query("skip", ParseIntPipe) skip: number, @Query("take", ParseIntPipe) take: number) {
+    try {
+      let pagination: PaginationDto = {
+        skip,
+        take
+      }
+      let voucherRes = await this.vouchersService.findAll(pagination)
+      res.statusMessage = voucherRes.message
+      res.status(voucherRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(voucherRes)
+    } catch (err) {
+      throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
+    }
   }
+
 
   @Get(':id')
   findOne(@Param('id') id: number) {

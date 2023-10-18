@@ -1,10 +1,11 @@
 import { async } from 'rxjs';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from './entities/voucher.entity';
 import { Repository } from 'typeorm';
+import { PaginationDto } from '../services/dto/pagination-service.dto';
 
 
 @Injectable()
@@ -28,21 +29,26 @@ export class VouchersService {
     }
   }
 
-  async findAll() {
+ 
+  async findAll(pagination: PaginationDto) {
     try {
-      let result = await this.voucherSer.find({
+      let services = await this.voucherSer.find({
         where: {
           IsDelete: false
-        }
+        },
+        skip: pagination.skip,
+        take: pagination.take
       })
-      if (!result) return false
-      return { status: true, message: "Get Vouchers Successfully !", data: result }
-    } catch {
+
+      let countItem = (await this.voucherSer.find()).length
+      let maxPage = Math.ceil(countItem / pagination.take)
       return {
-        status: false,
-        message: "Get Vouchers Failed",
-        data: null
+        message: 'successful',
+        data: services,
+        maxPage
       }
+    } catch (err) {
+      throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
     }
   }
 
