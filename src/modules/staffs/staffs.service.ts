@@ -4,22 +4,38 @@ import { UpdateStaffDto } from './dto/update-staff.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Staff } from './entities/staff.entity';
+import { CreateStaffServiceDto } from '../staff-services/dto/create-staff-service.dto';
+import { StaffService } from '../staff-services/entities/staff-service.entity';
 
 @Injectable()
 export class StaffsService {
 
   constructor(
-    @InjectRepository(Staff)
-    private StaffRepository: Repository<Staff>,
+    @InjectRepository(Staff) private StaffRepository: Repository<Staff>,
+    // @InjectRepository(StaffService) private StaffServiceRepository: Repository<StaffService>
   ) { }
 
 
-  async create(createStaffDto: CreateStaffDto) {
+  async create(createStaffDto: CreateStaffDto,
+    //serviceList: CreateStaffServiceDto
+  ) {
     try {
-      let staff = await this.StaffRepository.save(createStaffDto)
+      console.log("da vao");
+      const staff = await this.StaffRepository.save(createStaffDto)
+      // const newserviceList = await Promise.all(serviceList.serviceList?.map(async (staffService) => {
+      //   return await this.StaffRepository.save({
+      //     staffService,
+      //     productOptionsId: staff.id
+      //   })
+      // }))
+
+
       if (!staff) {
+        console.log("loi chuwa vao");
+
         throw new Error('Error')
       }
+      //let staffService = await this.staffServiceRepository.save(serviceList)
       let newStaff = await this.StaffRepository.findOne({
         where: {
           id: staff.id
@@ -29,8 +45,10 @@ export class StaffsService {
           appointmentDetails: true
         }
       })
+      console.log("newStaff", newStaff);
+
       if (!newStaff) {
-        throw new HttpException(`service not found`, HttpStatus.NOT_FOUND);
+        throw new HttpException(`staff not found`, HttpStatus.NOT_FOUND);
       }
       return {
         message: 'Servicio Creado',

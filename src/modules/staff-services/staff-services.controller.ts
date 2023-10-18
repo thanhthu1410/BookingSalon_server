@@ -1,15 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpException, HttpStatus } from '@nestjs/common';
 import { StaffServicesService } from './staff-services.service';
 import { CreateStaffServiceDto } from './dto/create-staff-service.dto';
 import { UpdateStaffServiceDto } from './dto/update-staff-service.dto';
+import { Response } from 'express'
 
 @Controller('staff-services')
 export class StaffServicesController {
-  constructor(private readonly staffServicesService: StaffServicesService) {}
+  constructor(private readonly staffServicesService: StaffServicesService) { }
 
   @Post()
-  create(@Body() createStaffServiceDto: CreateStaffServiceDto) {
-    return this.staffServicesService.create(createStaffServiceDto);
+  async create(@Body() createStaffServiceDto: CreateStaffServiceDto, @Res() res: Response) {
+    try {
+      let [status, message, data] = await this.staffServicesService.create(createStaffServiceDto);
+      return res.status(status ? 200 : 213).json({
+        message,
+        data
+      })
+    } catch (err) {
+      console.log("err", err);
+      throw new HttpException('loi controller', HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get()
