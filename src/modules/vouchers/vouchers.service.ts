@@ -69,23 +69,21 @@ export class VouchersService {
 
   }
 
-  async update(id: number, updateVoucherDto: UpdateVoucherDto) {
+  async update(id: number) {
     try {
-      const oldData = await this.voucherSer.findOne({
-        where: {
-          id
-        }
-      })
+      const oldData = (await this.findOne(Number(id))).data
       console.log("oldData", oldData);
-      console.log("updateVoucherDto", updateVoucherDto);
-
-      const resutl = this.voucherSer.merge(oldData, updateVoucherDto)
-      const updateData = await this.voucherSer.save(resutl)
+      const newData = {
+        ...oldData,
+        IsDelete: true
+      }
+      console.log("newData", newData);
+      const resutl = await this.voucherSer.update(oldData, newData)
       if (!resutl) return false
       return {
         status: true,
         message: "Delete Successfull ",
-        data: updateData
+        data: resutl
       }
     } catch {
       return {
@@ -94,9 +92,35 @@ export class VouchersService {
         data: null
       }
     }
+    
+  async update(id: number, updateVoucherDto: UpdateVoucherDto) {
+      try {
+        const oldData = await this.voucherSer.findOne({
+          where: {
+            id
+          }
+        })
+        console.log("oldData", oldData);
+        console.log("updateVoucherDto", updateVoucherDto);
 
+        const resutl = this.voucherSer.merge(oldData, updateVoucherDto)
+        const updateData = await this.voucherSer.save(resutl)
+        if (!resutl) return false
+        return {
+          status: true,
+          message: "Delete Successfull ",
+          data: updateData
+        }
+      } catch {
+        return {
+          status: false,
+          message: "Delete Faild ",
+          data: null
+        }
+      }
+
+    }
+    remove(id: number) {
+      return `This action removes a #${id} voucher`;
+    }
   }
-  remove(id: number) {
-    return `This action removes a #${id} voucher`;
-  }
-}
