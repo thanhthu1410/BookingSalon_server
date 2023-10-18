@@ -70,29 +70,28 @@ export class VouchersService {
   }
 
   async update(id: number) {
-   try{
-    const oldData = (await this.findOne(Number(id))).data
-    console.log("oldData",oldData);
-    
-    const newData = {
-      ...oldData,
-      IsDelete: true
+    try {
+      const oldData = (await this.findOne(Number(id))).data
+      console.log("oldData", oldData);
+      const newData = {
+        ...oldData,
+        IsDelete: true
+      }
+      console.log("newData", newData);
+      const resutl = await this.voucherSer.update(oldData, newData)
+      if (!resutl) return false
+      return {
+        status: true,
+        message: "Delete Successfull ",
+        data: resutl
+      }
+    } catch {
+      return {
+        status: false,
+        message: "Delete Faild ",
+        data: null
+      }
     }
-    console.log("newData",newData);
-    const resutl = await this.voucherSer.update(oldData, newData)
-   if(!resutl) return false
-   return {
-    status: true,
-    message: "Delete Successfull ",
-    data: resutl
-   }
-   }catch{
-    return {
-      status: false,
-      message: "Delete Faild ",
-      data: null
-     }
-   }
   }
   remove(id: number) {
     return `This action removes a #${id} voucher`;
