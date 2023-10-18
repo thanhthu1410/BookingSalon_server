@@ -21,14 +21,12 @@ export class ServicesController {
       ...data,
       avatar: avatar
     }
-
     try {
       let serviceRes = await this.servicesService.create(newData)
       res.status(serviceRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(serviceRes)
     } catch (err) {
       console.log("err", err);
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST);
-
     }
   }
 
