@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, UploadedFile, UseInterceptors, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, UploadedFile, UseInterceptors, HttpStatus, HttpException, Query, ParseIntPipe } from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
@@ -6,6 +6,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadFileToStorage } from 'src/firebase';
 import { Response } from 'express';
 import * as fs from 'fs';
+import { PaginationDto } from './dto/pagination-service.dto';
 
 @Controller('services')
 export class ServicesController {
@@ -33,13 +34,28 @@ export class ServicesController {
 
 
   @Get()
-  async findAll(@Res() res: Response) {
+  async findAll(@Res() res: Response, @Query("skip", ParseIntPipe) skip: number, @Query("take", ParseIntPipe) take: number) {
     try {
-      let serviceRes = await this.servicesService.findAll()
+      let pagination: PaginationDto = {
+        skip,
+        take
+      }
+      let serviceRes = await this.servicesService.findAll(pagination)
       res.statusMessage = serviceRes.message
       res.status(serviceRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(serviceRes)
     } catch (err) {
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @Get('search')
+  async search(@Res() res: Response, @Query('q') q: string) {
+    try {
+      if (q != undefined) {
+        return res.status(HttpStatus.OK).json(await this.servicesService.searchByName(q))
+      }
+    } catch (err) {
+      throw new HttpException('Loi Controller', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -57,8 +73,8 @@ export class ServicesController {
       if (serviceRes) {
         return res.status(HttpStatus.OK).json(serviceRes);
       }
-    } catch (error) {
-      console.error('Error in image upload:', error);
+    } catch (err) {
+      console.error('Error in image upload:', err);
       throw new HttpException('Loi Controller', HttpStatus.BAD_REQUEST);
     }
 
@@ -70,8 +86,15 @@ export class ServicesController {
     return this.servicesService.findOne(+id);
   }
 
+
+
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.servicesService.remove(+id);
+  async remove(@Param('id') id: number, @Res() res: Response) {
+    try {
+      let serviceRes = await this.servicesService.remove(id)
+      res.status(serviceRes ? HttpStatus.OK : HttpStatus.ACCEPTED).json(serviceRes)
+    } catch (err) {
+      throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
+    }
   }
 }
