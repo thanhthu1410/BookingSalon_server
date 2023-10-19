@@ -7,14 +7,24 @@ export class StaffService {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
-    createdAt: Date
+    @Column({
+        default: String(Date.now())
+    })
+    createdAt: string
 
-    @Column()
-    updatedAt: Date
+    @Column({
+        default: String(Date.now())
+    })
+    updatedAt: string
 
-    @Column()
+    @Column({ default: false })
     IsDelete: boolean
+
+    @Column({ nullable: false })
+    serviceId: string
+
+    @Column({ nullable: false })
+    staffId: string
 
     @ManyToOne(() => Staff, (staff) => staff.staffServices)
     @JoinColumn({ name: "staffId" })
