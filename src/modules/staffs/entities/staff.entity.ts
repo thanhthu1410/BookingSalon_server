@@ -29,18 +29,20 @@ export class Staff {
     @Column()
     desc: string
 
-    @Column({
-        default: String(Date.now())
-    })
+<<<<<<<< <Temporary merge branch 1
+@Column({ default: Date.now() })
+createdAt: string
+
+@Column({ default: Date.now() })
+=========
+    @Column({ default: Date.now() })
     createdAt: string
 
-    @Column({
-        default: String(Date.now())
-    })
+    @Column({ default: Date.now() })
+>>>>>>>>> Temporary merge branch 2
     updatedAt: string
 
     @Column({ default: false })
-
     IsDelete: boolean
 
     @OneToMany(() => AppointmentDetail, (appointmentDetail) => appointmentDetail.staff)
