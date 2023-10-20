@@ -98,8 +98,7 @@ export class ServicesService {
       if (!data) return false
       // console.log("updatedata", updateServiceDto);
 
-      let newData = this.serviceRepository.merge(data, updateServiceDto
-      )
+      let newData = this.serviceRepository.merge(data, updateServiceDto)
       let result = await this.serviceRepository.save(newData)
       // console.log("result", result);
 
@@ -124,14 +123,10 @@ export class ServicesService {
   async remove(id: number) {
     try {
       let oldData = await this.serviceRepository.findOne({ where: { id } })
-
-
       let newData = {
         ...oldData,
         isDelete: true
       }
-
-
       const result = this.serviceRepository.merge(oldData, newData)
 
       const updateResult = await this.serviceRepository.save(result)

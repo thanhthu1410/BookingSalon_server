@@ -30,12 +30,12 @@ export class Service {
 
 
     @Column({
-        default: String(Date.now())
+        default: Date.now()
     })
     createAt: string
 
     @Column({
-        default: String(Date.now())
+        default: Date.now()
     })
     updateAt: string
 

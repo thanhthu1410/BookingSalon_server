@@ -17,15 +17,6 @@ export class StaffServicesService {
 
   async create(createStaffServiceDto: CreateStaffServiceDto) {
     try {
-      let staffService = await this.StaffServiceRepository.save(createStaffServiceDto)
-      if (!staffService) return [false, "loi", null]
-      let newOptionDetail = await this.StaffServiceRepository.findOne({
-        where: {
-          id: staffService.id
-        }
-      })
-      if (!newOptionDetail) return [false, "loi", null]
-      return [true, "Create Ok!", newOptionDetail]
     } catch (err) {
       return [false, "Lỗi model", null]
     }

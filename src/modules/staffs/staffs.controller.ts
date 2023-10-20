@@ -18,13 +18,15 @@ export class StaffsController {
     const data = JSON.parse(body.staff)
     // console.log("body.staff:", body.staff)
     // console.log("file", file);
-    let avatar = await uploadFileToStorage(file, "staff", file.buffer)
+    let avatar = await uploadFileToStorage(file, "staff", file?.buffer)
+    console.log("avatar", avatar);
+
     const newData = {
       ...data,
       avatar: avatar
     }
     try {
-      let staffRes = await this.staffsService.create(newData)
+      let staffRes = await this.staffsService.create(newData, data.serviceList)
       //serviceList
 
       res.status(staffRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(staffRes)
@@ -36,8 +38,15 @@ export class StaffsController {
   }
 
   @Get()
-  findAll() {
-    return this.staffsService.findAll();
+  async findAll(@Res() res: Response,) {
+    try {
+      let staffRes = await this.staffsService.findAll()
+      res.statusMessage = staffRes.message
+      res.status(staffRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(staffRes)
+    } catch (err) {
+      console.log("err:", err)
+      throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
+    }
   }
 
   @Get(':id')
@@ -46,12 +55,47 @@ export class StaffsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStaffDto: UpdateStaffDto) {
-    return this.staffsService.update(+id, updateStaffDto);
+  @UseInterceptors(FileInterceptor('avatar'))
+  async update(@Res() res: Response, @Param('id') id: number, @Body() body: any, updateStaffDto: UpdateStaffDto, @UploadedFile() file: Express.Multer.File) {
+    try {
+      let data;
+      if (body.staff) {
+        data = JSON.parse(body.staff);
+        console.log("data", data);
+      }
+      if (file) {
+        let url = await uploadFileToStorage(file, "staff", file?.buffer)
+        data = {
+          ...data,
+          avatar: url
+        }
+        let staffRes = await this.staffsService.update(id, data);
+        if (staffRes) {
+          return res.status(HttpStatus.OK).json(staffRes);
+        }
+      } else {
+        let staffRes = await this.staffsService.update(id, data);
+        if (staffRes) {
+          return res.status(HttpStatus.OK).json(staffRes);
+        }
+      }
+
+      // console.log(" staffRes:", staffRes)
+
+
+    } catch (err) {
+      console.log(" err:", err)
+      throw new HttpException('Loi Controller', HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.staffsService.remove(+id);
+  async remove(@Param('id') id: number, @Res() res: Response) {
+    try {
+      let staffRes = await this.staffsService.remove(id)
+      res.status(staffRes ? HttpStatus.OK : HttpStatus.ACCEPTED).json(staffRes)
+    } catch (err) {
+      throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
+    }
   }
 }

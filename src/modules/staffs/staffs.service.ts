@@ -4,7 +4,6 @@ import { UpdateStaffDto } from './dto/update-staff.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Staff } from './entities/staff.entity';
-import { CreateStaffServiceDto } from '../staff-services/dto/create-staff-service.dto';
 import { StaffService } from '../staff-services/entities/staff-service.entity';
 
 @Injectable()
@@ -12,47 +11,30 @@ export class StaffsService {
 
   constructor(
     @InjectRepository(Staff) private StaffRepository: Repository<Staff>,
-    // @InjectRepository(StaffService) private StaffServiceRepository: Repository<StaffService>
+    @InjectRepository(StaffService) private StaffServiceRepository: Repository<StaffService>
   ) { }
-
-
   async create(createStaffDto: CreateStaffDto,
-    //serviceList: CreateStaffServiceDto
+    serviceList: Array<number>
   ) {
     try {
-      console.log("da vao");
-      const staff = await this.StaffRepository.save(createStaffDto)
-      // const newserviceList = await Promise.all(serviceList.serviceList?.map(async (staffService) => {
-      //   return await this.StaffRepository.save({
-      //     staffService,
-      //     productOptionsId: staff.id
-      //   })
-      // }))
 
+      const newstaff = await this.StaffRepository.save(createStaffDto)
 
-      if (!staff) {
+      for (let service of serviceList) {
+        await this.StaffServiceRepository.save({
+          staffId: newstaff.id,
+          serviceId: service
+        })
+      }
+
+      if (!newstaff) {
         console.log("loi chuwa vao");
 
         throw new Error('Error')
       }
-      //let staffService = await this.staffServiceRepository.save(serviceList)
-      let newStaff = await this.StaffRepository.findOne({
-        where: {
-          id: staff.id
-        },
-        relations: {
-          staffServices: true,
-          appointmentDetails: true
-        }
-      })
-      console.log("newStaff", newStaff);
-
-      if (!newStaff) {
-        throw new HttpException(`staff not found`, HttpStatus.NOT_FOUND);
-      }
       return {
         message: 'Servicio Creado',
-        data: staff
+        data: newstaff
       }
     } catch (err) {
       console.log("err", err);
@@ -61,19 +43,94 @@ export class StaffsService {
 
   }
 
-  findAll() {
-    return `This action returns all staffs`;
+  async findAll() {
+    try {
+      let listStaff = await this.StaffRepository.find({
+        where: {
+          IsDelete: false
+        },
+        relations: {
+          appointmentDetails: true,
+          staffServices: {
+            service: true
+          }
+        }
+      })
+      return {
+        message: 'successful',
+        data: listStaff,
+      }
+    } catch (err) {
+      console.log(" err:", err)
+      throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
+    }
   }
 
   findOne(id: number) {
     return `This action returns a #${id} staff`;
   }
 
-  update(id: number, updateStaffDto: UpdateStaffDto) {
-    return `This action updates a #${id} staff`;
+  async update(id: number, updateStaffDto: UpdateStaffDto) {
+    try {
+      const data = await this.StaffRepository.findOne({
+        where: { id },
+        relations: {
+          appointmentDetails: true,
+          staffServices: {
+            service: true
+          }
+        }
+      })
+      console.log("data :", data)
+      if (!data) return false
+
+      let newData = this.StaffRepository.merge(data, updateStaffDto)
+      let result = await this.StaffRepository.save(newData)
+      console.log("result:", result)
+      return {
+        message: 'update successful',
+        data: result
+      }
+    } catch (err) {
+      console.log("err service:", err)
+      return {
+        status: false,
+        message: "Update Faild ",
+        data: null
+      }
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} staff`;
+  async remove(id: number) {
+    try {
+      let oldStaff = await this.StaffRepository.findOne({ where: { id } })
+      let newstaff = {
+
+        ...oldStaff,
+        IsDelete: true
+      }
+      console.log("newstaff:", newstaff)
+
+
+      const result = this.StaffRepository.merge(oldStaff, newstaff)
+      console.log("result:", result)
+
+      const updateResult = await this.StaffRepository.save(result)
+      console.log("updateStaff", updateResult);
+
+      if (updateResult) {
+        return {
+          status: true,
+          data: updateResult,
+          message: "Delete ok"
+        }
+      }
+    } catch (err) {
+      return {
+        status: false,
+        message: "Delete Faild ",
+        data: null
+      }
+    }
   }
 }

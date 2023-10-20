@@ -21,10 +21,10 @@ export class StaffService {
     IsDelete: boolean
 
     @Column({ nullable: false })
-    serviceId: string
+    serviceId: number
 
     @Column({ nullable: false })
-    staffId: string
+    staffId: number
 
     @ManyToOne(() => Staff, (staff) => staff.staffServices)
     @JoinColumn({ name: "staffId" })

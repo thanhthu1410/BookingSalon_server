@@ -23,20 +23,16 @@ export class Staff {
     @Column()
     experience: string
 
-    @Column({ type: 'enum', enum: StaffStatus, default: StaffStatus.ACTIVE })
-    status: StaffStatus
+    @Column({ default: true })
+    status: boolean
 
     @Column()
     desc: string
 
-    @Column({
-        default: String(Date.now())
-    })
+    @Column({ default: Date.now() })
     createdAt: string
 
-    @Column({
-        default: String(Date.now())
-    })
+    @Column({ default: Date.now() })
     updatedAt: string
 
     @Column({ default: false })
