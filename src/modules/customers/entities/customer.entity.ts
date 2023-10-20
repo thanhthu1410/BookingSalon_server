@@ -15,16 +15,16 @@ export class Customer {
     @Column()
     email: string
 
-    @Column()
-    createdAt: Date
+    @Column({default: Date.now()})
+    createdAt: string
 
-    @Column()
-    updatedAt: Date
+    @Column({default: Date.now()})
+    updatedAt: string
 
-    @Column()
+    @Column({default: false})
     IsDelete: boolean
 
-    @Column()
+    @Column({default: true})
     status: boolean
 
     @OneToMany(() => Appointment, (appointment) => appointment.customer)

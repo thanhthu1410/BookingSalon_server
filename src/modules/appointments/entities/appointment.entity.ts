@@ -9,29 +9,31 @@ export class Appointment {
     id: number
 
     @Column()
-    date: Date
+    date: string
 
     @Column()
-    time: Date
+    time: string
 
-    @Column()
-    createdAt: Date
+    @Column({default:  Date.now()})
+    createdAt: string
 
-    @Column()
-    updatedAt: Date
+    @Column({default:  Date.now()})
+    updatedAt: string
 
-    @Column()
+    @Column({default: false})
     IsDelete: boolean
 
-    @Column()
+    @Column({default: "busy"})
     reasonDelete: string
 
-    @Column()
+    @Column({default:0})
     total: number
 
     @Column({ type: 'enum', enum: AppointmentStatus, default: AppointmentStatus.PENDING })
     status: AppointmentStatus
 
+    @Column()
+    customerId: number
     @ManyToOne(() => Customer, (customer) => customer.appointments)
     @JoinColumn({ name: 'customerId' })
     customer: Customer
