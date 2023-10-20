@@ -76,7 +76,9 @@ export class ServicesService {
           isDelete: false
         },
         relations: {
-          staffServices: true,
+          staffServices: {
+            staff: true
+          },
           appointmentDetails: true
         }
 

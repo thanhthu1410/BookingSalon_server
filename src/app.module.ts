@@ -14,6 +14,7 @@ import { UsersModule } from './modules/users/users.module';
 import { VouchersModule } from './modules/vouchers/vouchers.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { VoucherHistoryModule } from './modules/voucher-history/voucher-history.module';
+import { SocketModule } from './modules/socket/socket.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { VoucherHistoryModule } from './modules/voucher-history/voucher-history.
       entities: ["dist/**/*.entity{.ts,.js}"],
       synchronize: true,
     }),
+    SocketModule,
     CustomersModule, ServicesModule, AppointmentsModule, TimeModule, AppointmentDetailsModule, StaffsModule, StaffServicesModule, UsersModule, VouchersModule, AuthModule, VoucherHistoryModule],
   controllers: [AppController],
   providers: [AppService],
