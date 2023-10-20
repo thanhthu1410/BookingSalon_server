@@ -29,17 +29,14 @@ export class Staff {
     @Column()
     desc: string
 
-    @Column({
-        default: String(Date.now())
-    })
+    @Column({default: Date.now()})
     createdAt: string
 
-    @Column({
-        default: String(Date.now())
-    })
+    @Column({default: Date.now()})
     updatedAt: string
-
+    
     @Column({ default: false })
+
     IsDelete: boolean
 
     @OneToMany(() => AppointmentDetail, (appointmentDetail) => appointmentDetail.staff)
