@@ -4,7 +4,7 @@ import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadFileToStorage } from 'src/firebase';
-import { Response } from 'express';
+import { Response, query } from 'express';
 import * as fs from 'fs';
 import { PaginationDto } from './dto/pagination-service.dto';
 
@@ -21,14 +21,12 @@ export class ServicesController {
       ...data,
       avatar: avatar
     }
-
     try {
       let serviceRes = await this.servicesService.create(newData)
       res.status(serviceRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(serviceRes)
     } catch (err) {
       console.log("err", err);
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST);
-
     }
   }
 
@@ -47,16 +45,26 @@ export class ServicesController {
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
     }
   }
-
   @Get('search')
-  async search(@Res() res: Response, @Query('q') q: string) {
-    try {
-      if (q != undefined) {
+  async findAllService(@Res() res: Response, @Query('q') q: string) {
+
+    if (q != undefined) {
+      try {
         return res.status(HttpStatus.OK).json(await this.servicesService.searchByName(q))
+      } catch (err) {
+        throw new HttpException('Loi Controller', HttpStatus.BAD_REQUEST);
       }
-    } catch (err) {
-      throw new HttpException('Loi Controller', HttpStatus.BAD_REQUEST);
+
+    } else {
+      try {
+        let serviceResAll = await this.servicesService.findServie()
+        res.statusMessage = serviceResAll.message
+        res.status(serviceResAll.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(serviceResAll)
+      } catch (err) {
+        throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
+      }
     }
+
   }
 
   @Patch(':id')

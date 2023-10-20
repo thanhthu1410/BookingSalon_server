@@ -69,6 +69,27 @@ export class ServicesService {
     }
   }
 
+  async findServie() {
+    try {
+      let services = await this.serviceRepository.find({
+        where: {
+          isDelete: false
+        },
+        relations: {
+          staffServices: true,
+          appointmentDetails: true
+        }
+
+      })
+      return {
+        message: 'successful',
+        data: services,
+      }
+    } catch (err) {
+      throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
+    }
+  }
+
   async update(id: number, updateServiceDto: UpdateServiceDto) {
     try {
       let data = await this.serviceRepository.findOne({ where: { id } })

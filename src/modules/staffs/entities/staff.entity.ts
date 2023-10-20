@@ -15,7 +15,7 @@ export class Staff {
     avatar: string
 
     @Column()
-    birthDay: Date
+    birthDay: string
 
     @Column()
     phoneNumber: string
@@ -34,8 +34,9 @@ export class Staff {
 
     @Column({default: Date.now()})
     updatedAt: string
+    
+    @Column({ default: false })
 
-    @Column({default: false})
     IsDelete: boolean
 
     @OneToMany(() => AppointmentDetail, (appointmentDetail) => appointmentDetail.staff)
