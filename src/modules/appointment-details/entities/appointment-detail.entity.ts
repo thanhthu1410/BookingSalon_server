@@ -11,23 +11,35 @@ export class AppointmentDetail {
     @Column()
     price: number
 
-    @Column()
-    createdAt: Date
+    @Column({default: 1})
+    slot: number
 
-    @Column()
-    updatedAt: Date
+    @Column({default: Date.now()})
+    createdAt: string
 
-    @Column()
+    @Column({default: Date.now()})
+    updatedAt: string
+
+    @Column({default: false})
     IsDelete: boolean
 
+
+    @Column()
+    appointmentId: number
     @ManyToOne(() => Appointment, (appointment) => appointment.appointmentDetails)
     @JoinColumn({ name: "appointmentId" })
     appointment: Appointment
 
+
+    
+    @Column()
+    serviceId: number
     @ManyToOne(() => Service, (service) => service.appointmentDetails)
     @JoinColumn({ name: "serviceId" })
     service: Service
 
+    @Column()
+    staffId: number
     @ManyToOne(() => Staff, (staff) => staff.appointmentDetails)
     @JoinColumn({ name: "staffId" })
     staff: Staff

@@ -4,10 +4,19 @@ import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Voucher } from './entities/voucher.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { PaginationDto } from '../services/dto/pagination-service.dto';
+import moment from 'moment';
 
+function formatTimestampToDate(timestamp) {
+  const date = new Date(timestamp);
 
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
 @Injectable()
 export class VouchersService {
   constructor(@InjectRepository(Voucher) private voucherSer: Repository<Voucher>) { }
@@ -29,7 +38,7 @@ export class VouchersService {
     }
   }
 
- 
+
   async findAll(pagination: PaginationDto) {
     try {
       let services = await this.voucherSer.find({
@@ -43,12 +52,108 @@ export class VouchersService {
       let countItem = (await this.voucherSer.find()).length
       let maxPage = Math.ceil(countItem / pagination.take)
       return {
-        message: 'successful',
+        message: 'get voucher pagination successful',
         data: services,
         maxPage
       }
     } catch (err) {
       throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  async findMany() {
+    let result = await this.voucherSer.find({
+      where:{
+      IsDelete:false
+      }
+    })
+    if (!result) return {
+      status: false,
+      message: "get faild"
+    }
+    return {
+      status: true,
+      message: 'successful get all voucher',
+      data: result
+    }
+  }
+
+  async searchByCode(searchString: string) {
+    try {
+      let result = await this.voucherSer.find({
+        where: {
+          code: ILike(`%${searchString}%`),
+          IsDelete: false
+        }
+      })
+      if (result.length > 0) {
+        return {
+          data: result,
+          message: "search voucher okey"
+        }
+      } else {
+        return {
+          massage: "invailid voucher"
+        }
+      }
+
+    } catch {
+      return {
+        data: null,
+        message: "search voucher faild"
+      }
+
+    }
+  }
+  async getVoucher(searchString: string) {
+    try {
+      let result = await this.voucherSer.findOne({
+        where: {
+          code: ILike(`${searchString}`),
+          IsDelete: false
+        }
+      })
+      if(result){
+        // check xem trang thai voucher da su dung hay chua
+        if(!result.status){
+          console.log("date.now",Date.now());
+          // check xem voucher con trong thoi han hay khong
+          if((Date.now() - Number(result.startAt)) < 0 || (Date.now() - Number(result.endAt)) > 0 ){
+              console.log("starttiem",formatTimestampToDate(Number(result.startAt)));
+             return {
+               status: false,
+               data: null,
+                message: ` Expiry date of Voucher From : ${formatTimestampToDate(Number(result.startAt))}  - To : ${formatTimestampToDate(Number(result.endAt))} !`
+             }      
+          }else{
+            return {
+              status: true,
+              data: result,
+              message: "Add Voucher Successfull !"
+            }
+          }
+        }else{
+          return {
+            status: false,
+            data: null,
+            message: "Voucher has been used, please try again with another voucher, Thank You !"
+          }
+        }
+       
+      }else{
+        return{
+          status: false,
+          message: " Voucher Invalid !"
+        }
+      }
+      
+
+    } catch {
+      return {
+        data: null,
+        message: "search voucher faild"
+      }
+
     }
   }
 
@@ -74,7 +179,6 @@ export class VouchersService {
     }
 
   }
-
 
   async update(id: number, updateVoucherDto: UpdateVoucherDto) {
     try {

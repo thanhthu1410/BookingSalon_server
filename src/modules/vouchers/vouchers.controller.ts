@@ -44,6 +44,42 @@ export class VouchersController {
      if(!voucherRes) return false
       return res.status(voucherRes ? 200 : 213).json(voucherRes)
   }
+
+
+  @Get("search")
+  async finMany( @Res() res: Response, @Query("search") search: string) {
+   
+    if(search != undefined){
+      try{
+        let serviceRes = await this.vouchersService.searchByCode(search);
+        res.statusMessage = serviceRes.message;
+        return res.status(HttpStatus.OK).json(serviceRes)
+      }catch(err){
+        throw new HttpException("loi controller", HttpStatus.BAD_REQUEST)
+      }
+    }else{
+      try{
+        let serviceRes = await this.vouchersService.findMany();
+        res.statusMessage = serviceRes.message;
+        return res.status(HttpStatus.OK).json(serviceRes)
+      }catch(err){
+        throw new HttpException("loi controller", HttpStatus.BAD_REQUEST)
+      }
+
+    }
+    
+  }
+
+  @Get("getvoucher")
+  async getVoucher( @Res() res: Response, @Query("getvoucher") search: string) {
+      try{
+        let serviceRes = await this.vouchersService.getVoucher(search);
+        res.statusMessage = serviceRes.message;
+        return res.status(HttpStatus.OK).json(serviceRes)
+      }catch(err){
+        throw new HttpException("loi controller", HttpStatus.BAD_REQUEST)
+      }    
+  }
   @Get()
   async findAll(@Res() res: Response, @Query("skip", ParseIntPipe) skip: number, @Query("take", ParseIntPipe) take: number) {
     try {

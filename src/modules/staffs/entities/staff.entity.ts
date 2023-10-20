@@ -32,9 +32,12 @@ export class Staff {
     @Column({ default: Date.now() })
     createdAt: string
 
-    @Column({ default: Date.now() })
-    updatedAt: string
+    @Column({default: Date.now()})
+    createdAt: string
 
+    @Column({default: Date.now()})
+    updatedAt: string
+    
     @Column({ default: false })
     IsDelete: boolean
 
