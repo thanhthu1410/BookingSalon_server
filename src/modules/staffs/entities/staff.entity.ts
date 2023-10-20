@@ -29,17 +29,10 @@ export class Staff {
     @Column()
     desc: string
 
-<<<<<<<< <Temporary merge branch 1
-@Column({ default: Date.now() })
-createdAt: string
-
-@Column({ default: Date.now() })
-=========
     @Column({ default: Date.now() })
     createdAt: string
 
     @Column({ default: Date.now() })
->>>>>>>>> Temporary merge branch 2
     updatedAt: string
 
     @Column({ default: false })
