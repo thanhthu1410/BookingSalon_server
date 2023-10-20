@@ -23,11 +23,14 @@ export class Staff {
     @Column()
     experience: string
 
-    @Column({ type: 'enum', enum: StaffStatus, default: StaffStatus.ACTIVE })
-    status: StaffStatus
+    @Column({ default: true })
+    status: boolean
 
     @Column()
     desc: string
+
+    @Column({ default: Date.now() })
+    createdAt: string
 
     @Column({default: Date.now()})
     createdAt: string
@@ -36,7 +39,6 @@ export class Staff {
     updatedAt: string
     
     @Column({ default: false })
-
     IsDelete: boolean
 
     @OneToMany(() => AppointmentDetail, (appointmentDetail) => appointmentDetail.staff)

@@ -5,7 +5,7 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { uploadFileToStorage } from 'src/firebase';
 import { Response, query } from 'express';
-import * as fs from 'fs';
+
 import { PaginationDto } from './dto/pagination-service.dto';
 
 @Controller('services')
@@ -74,7 +74,7 @@ export class ServicesController {
     updateServiceDto = JSON.parse(body.services)
     try {
       if (file) {
-        let url = await uploadFileToStorage(file, "service", file.buffer)
+        let url = await uploadFileToStorage(file, "service", file?.buffer)
         updateServiceDto.avatar = url;
       }
       let serviceRes = await this.servicesService.update(id, updateServiceDto);

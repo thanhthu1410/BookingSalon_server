@@ -2,7 +2,6 @@
 import { Allow } from "class-validator"
 
 export class CreateStaffDto {
-
     @Allow()
     name: string
 
@@ -20,8 +19,4 @@ export class CreateStaffDto {
 
     @Allow()
     experience: string
-
-
-
-
 }
