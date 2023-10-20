@@ -29,13 +29,13 @@ export class Staff {
     @Column()
     desc: string
 
-    @Column()
-    createdAt: Date
+    @Column({default: Date.now()})
+    createdAt: string
 
-    @Column()
-    updatedAt: Date
+    @Column({default: Date.now()})
+    updatedAt: string
 
-    @Column()
+    @Column({default: false})
     IsDelete: boolean
 
     @OneToMany(() => AppointmentDetail, (appointmentDetail) => appointmentDetail.staff)
