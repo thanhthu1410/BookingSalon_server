@@ -15,10 +15,13 @@ import { VouchersModule } from './modules/vouchers/vouchers.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { VoucherHistoryModule } from './modules/voucher-history/voucher-history.module';
 import { SocketModule } from './modules/socket/socket.module';
+import { CronjobsModule } from './modules/cronjobs/cronjobs.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.MYSQL_HOST,
@@ -30,7 +33,7 @@ import { SocketModule } from './modules/socket/socket.module';
       synchronize: true,
     }),
     SocketModule,
-    CustomersModule, ServicesModule, AppointmentsModule, TimeModule, AppointmentDetailsModule, StaffsModule, StaffServicesModule, UsersModule, VouchersModule, AuthModule, VoucherHistoryModule],
+    CustomersModule, ServicesModule, AppointmentsModule, TimeModule, AppointmentDetailsModule, StaffsModule, StaffServicesModule, UsersModule, VouchersModule, AuthModule, VoucherHistoryModule,CronjobsModule],
   controllers: [AppController],
   providers: [AppService],
 })
