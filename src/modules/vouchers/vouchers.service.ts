@@ -63,8 +63,8 @@ export class VouchersService {
 
   async findMany() {
     let result = await this.voucherSer.find({
-      where:{
-      IsDelete:false
+      where: {
+        IsDelete: false
       }
     })
     if (!result) return {
@@ -113,40 +113,40 @@ export class VouchersService {
           IsDelete: false
         }
       })
-      if(result){
+      if (result) {
         // check xem trang thai voucher da su dung hay chua
-        if(!result.status){
-          console.log("date.now",Date.now());
+        if (!result.status) {
+          console.log("date.now", Date.now());
           // check xem voucher con trong thoi han hay khong
-          if((Date.now() - Number(result.startAt)) < 0 || (Date.now() - Number(result.endAt)) > 0 ){
-              console.log("starttiem",formatTimestampToDate(Number(result.startAt)));
-             return {
-               status: false,
-               data: null,
-                message: ` Expiry date of Voucher From : ${formatTimestampToDate(Number(result.startAt))}  - To : ${formatTimestampToDate(Number(result.endAt))} !`
-             }      
-          }else{
+          if ((Date.now() - Number(result.startAt)) < 0 || (Date.now() - Number(result.endAt)) > 0) {
+            console.log("starttiem", formatTimestampToDate(Number(result.startAt)));
+            return {
+              status: false,
+              data: null,
+              message: ` Expiry date of Voucher From : ${formatTimestampToDate(Number(result.startAt))}  - To : ${formatTimestampToDate(Number(result.endAt))} !`
+            }
+          } else {
             return {
               status: true,
               data: result,
               message: "Add Voucher Successfull !"
             }
           }
-        }else{
+        } else {
           return {
             status: false,
             data: null,
             message: "Voucher has been used, please try again with another voucher, Thank You !"
           }
         }
-       
-      }else{
-        return{
+
+      } else {
+        return {
           status: false,
           message: " Voucher Invalid !"
         }
       }
-      
+
 
     } catch {
       return {

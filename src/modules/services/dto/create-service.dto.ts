@@ -3,7 +3,7 @@ import { Allow } from "class-validator"
 export class CreateServiceDto {
 
     @Allow()
-    price: string
+    price: number
 
     @Allow()
     name: string

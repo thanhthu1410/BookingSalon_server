@@ -3,7 +3,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Res, ParseIntPipe, H
 import { VouchersService } from './vouchers.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
-import { Response } from "express"
+import { Response } from "express";
 import { PaginationDto } from '../services/dto/pagination-service.dto';
 
 function generateRandomString(length: number) {
@@ -21,15 +21,15 @@ function generateRandomString(length: number) {
 
 @Controller('vouchers')
 export class VouchersController {
-  constructor(private readonly vouchersService: VouchersService) {}
+  constructor(private readonly vouchersService: VouchersService) { }
   @Post()
   async create(@Body() body: any, createVoucherDto: CreateVoucherDto, @Res() res: Response) {
-    
-   let arrayVoucher = [];
+
+    let arrayVoucher = [];
     for (let i = 0; i < body.quantity; i++) {
       let createVoucher = generateRandomString(6)
 
-      
+
       let formatVoucher = {
         code: createVoucher,
         discountType: body.discountType,
@@ -41,44 +41,45 @@ export class VouchersController {
       arrayVoucher.push(formatVoucher)
     }
     let voucherRes = await Promise.all(arrayVoucher.map(async (voucher) => await this.vouchersService.create(voucher)));
-     if(!voucherRes) return false
-      return res.status(voucherRes ? 200 : 213).json(voucherRes)
+    if (!voucherRes) return false
+    return res.status(voucherRes ? 200 : 213).json(voucherRes)
   }
 
 
   @Get("search")
-  async finMany( @Res() res: Response, @Query("search") search: string) {
-   
-    if(search != undefined){
-      try{
+  async finMany(@Res() res: Response, @Query("search") search: string) {
+
+    if (search != undefined) {
+      try {
         let serviceRes = await this.vouchersService.searchByCode(search);
         res.statusMessage = serviceRes.message;
         return res.status(HttpStatus.OK).json(serviceRes)
-      }catch(err){
+      } catch (err) {
         throw new HttpException("loi controller", HttpStatus.BAD_REQUEST)
       }
-    }else{
-      try{
+    } else {
+      try {
         let serviceRes = await this.vouchersService.findMany();
         res.statusMessage = serviceRes.message;
         return res.status(HttpStatus.OK).json(serviceRes)
-      }catch(err){
+      } catch (err) {
         throw new HttpException("loi controller", HttpStatus.BAD_REQUEST)
       }
 
     }
-    
+
   }
 
   @Get("getvoucher")
-  async getVoucher( @Res() res: Response, @Query("getvoucher") search: string) {
-      try{
-        let serviceRes = await this.vouchersService.getVoucher(search);
-        res.statusMessage = serviceRes.message;
-        return res.status(HttpStatus.OK).json(serviceRes)
-      }catch(err){
-        throw new HttpException("loi controller", HttpStatus.BAD_REQUEST)
-      }    
+  async getVoucher(@Res() res: Response, @Query("getvoucher") search: string) {
+    try {
+      let serviceRes = await this.vouchersService.getVoucher(search);
+      console.log("serviceRes", serviceRes);
+      res.statusMessage = serviceRes.message;
+      return res.status(serviceRes.status ? 200 : 213).json(serviceRes)
+    } catch (err) {
+      throw new HttpException("loi controller", HttpStatus.BAD_REQUEST)
+    }
   }
   @Get()
   async findAll(@Res() res: Response, @Query("skip", ParseIntPipe) skip: number, @Query("take", ParseIntPipe) take: number) {
@@ -103,9 +104,9 @@ export class VouchersController {
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() updateVoucherDto: UpdateVoucherDto) {
-    console.log("id",id);
-    
-    return this.vouchersService.update(id,updateVoucherDto);
+    console.log("id", id);
+
+    return this.vouchersService.update(id, updateVoucherDto);
   }
 
   @Delete(':id')

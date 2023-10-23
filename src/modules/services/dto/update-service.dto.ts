@@ -4,7 +4,7 @@ import { Allow } from 'class-validator';
 
 export class UpdateServiceDto extends PartialType(CreateServiceDto) {
     @Allow()
-    price: string
+    price: number
 
     @Allow()
     name: string

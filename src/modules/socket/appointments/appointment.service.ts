@@ -99,10 +99,7 @@ export class AppointmentService {
                     }
                 }
             });
-            return {
-                status: true,
-                data: listAppointments
-            }
+            return listAppointments
         } catch {
             return {
                 status: false,

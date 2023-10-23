@@ -20,7 +20,7 @@ export class Service {
     desc: string
 
     @Column()
-    price: string
+    price: number
 
     @Column({ default: true })
     status: boolean

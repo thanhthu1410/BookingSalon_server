@@ -57,9 +57,9 @@ export class AppointmentSocketGateWay implements OnModuleInit {
                     let listAppointments = await this.handleBooking(body);
                     if (listAppointments) {
                         for (let i in this.clients) {
-                            this.clients[i].socket.emit("listAppointments", listAppointments);
+                            this.clients[i].socket.emit("listAppointments", listAppointments.data);
                         }
-                        socket.emit("listAppointments", listAppointments);
+                        socket.emit("listAppointments", listAppointments.data);
                     } else {
                         socket.emit("bookingFail", {
                             message: "Booking fail"
