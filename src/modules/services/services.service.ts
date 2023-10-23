@@ -5,14 +5,48 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Service } from './entities/service.entity';
 import { ILike, Repository } from 'typeorm';
 import { PaginationDto } from './dto/pagination-service.dto';
+import { StaffService } from '../staff-services/entities/staff-service.entity';
 
 @Injectable()
 export class ServicesService {
 
   constructor(
-    @InjectRepository(Service)
-    private serviceRepository: Repository<Service>,
+    @InjectRepository(Service) private serviceRepository: Repository<Service>,
+    @InjectRepository(StaffService) private StaffServiceRepository: Repository<StaffService>
   ) { }
+
+
+
+  async remove(id: number) {
+    try {
+      let serviceData = await this.serviceRepository.findOne({ where: { id } })
+
+      let newData = {
+        ...serviceData,
+        isDelete: true
+      }
+      const result = this.serviceRepository.merge(serviceData, newData)
+
+      const updateResult = await this.serviceRepository.save(result)
+
+      if (updateResult) {
+        return {
+          status: true,
+          data: updateResult,
+          message: "Delete ok"
+        }
+      }
+
+    } catch (err) {
+      return {
+        status: false,
+        message: "Delete Faild ",
+        data: null
+      }
+    }
+  }
+
+
 
   async create(createServiceDto: CreateServiceDto) {
     try {
@@ -20,16 +54,8 @@ export class ServicesService {
       if (!service) {
         throw new Error('Error')
       }
-      let newService = await this.serviceRepository.findOne({
-        where: {
-          id: service.id
-        },
-        relations: {
-          staffServices: true,
-          appointmentDetails: true
-        }
-      })
-      if (!newService) {
+
+      if (!service) {
         throw new HttpException(`service not found`, HttpStatus.NOT_FOUND);
       }
       return {
@@ -46,15 +72,17 @@ export class ServicesService {
     try {
       let services = await this.serviceRepository.find({
         where: {
-          isDelete: false
+          isDelete: false,
         },
-
         relations: {
-          staffServices: true,
+          staffServices: {
+            service: true,
+            staff: true
+          },
           appointmentDetails: true
         },
         skip: pagination.skip,
-        take: pagination.take
+        take: pagination.take,
       })
 
       let countItem = (await this.serviceRepository.find()).length
@@ -95,14 +123,14 @@ export class ServicesService {
   async update(id: number, updateServiceDto: UpdateServiceDto) {
     try {
       let data = await this.serviceRepository.findOne({ where: { id } })
-      console.log("data", data);
+      console.log("dataupdate", data);
 
       if (!data) return false
       // console.log("updatedata", updateServiceDto);
 
       let newData = this.serviceRepository.merge(data, updateServiceDto)
       let result = await this.serviceRepository.save(newData)
-      // console.log("result", result);
+      console.log("result", result);
 
       return {
         status: true,
@@ -122,43 +150,17 @@ export class ServicesService {
     return `This action returns a #${id} service`;
   }
 
-  async remove(id: number) {
-    try {
-      let oldData = await this.serviceRepository.findOne({ where: { id } })
-      let newData = {
-        ...oldData,
-        isDelete: true
-      }
-      const result = this.serviceRepository.merge(oldData, newData)
-
-      const updateResult = await this.serviceRepository.save(result)
-
-      if (updateResult) {
-        return {
-          status: true,
-          data: updateResult,
-          message: "Delete ok"
-        }
-      }
-
-    } catch (err) {
-      return {
-        status: false,
-        message: "Delete Faild ",
-        data: null
-      }
-    }
-  }
 
   async searchByName(name: string) {
     try {
       let service = await this.serviceRepository.find({
         where: {
+          isDelete: false,
           name: ILike(`%${name}%`),
         },
         relations: {
           staffServices: true,
-          appointmentDetails: true
+          //appointmentDetails: true
         }
       }
       );

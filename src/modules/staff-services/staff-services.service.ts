@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateStaffServiceDto } from './dto/create-staff-service.dto';
 import { UpdateStaffServiceDto } from './dto/update-staff-service.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,25 +17,71 @@ export class StaffServicesService {
 
   async create(createStaffServiceDto: CreateStaffServiceDto) {
     try {
+      let service = await this.StaffServiceRepository.save(createStaffServiceDto)
+      return {
+        status: true,
+        message: 'Servicio Creado',
+        data: service
+      }
     } catch (err) {
-      return [false, "Lỗi model", null]
+      console.log("err", err);
+      return {
+        status: false,
+        message: 'Create fail',
+        data: null
+      }
     }
-
   }
 
   findAll() {
     return `This action returns all staffServices`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} staffService`;
+  async findOne(id: number) {
+    try {
+      let staffServiceId = await this.StaffServiceRepository.findOne({
+        where: { id },
+        relations: {
+          staff: true,
+          service: true
+        }
+      })
+      return {
+        status: true,
+        message: "find categoryId success",
+        data: staffServiceId
+      }
+    } catch (err) {
+      return {
+        status: false,
+        message: "find categoryId success",
+        data: null
+      }
+    }
   }
 
   update(id: number, updateStaffServiceDto: UpdateStaffServiceDto) {
     return `This action updates a #${id} staffService`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} staffService`;
+  async remove(id: number) {
+    try {
+      let staffServiceId = await this.StaffServiceRepository.delete(id)
+      //console.log("staffServiceId:", staffServiceId)
+      return {
+        status: true,
+        message: "delete success",
+        data: staffServiceId
+      }
+    } catch (err) {
+      //console.log(" err:", err)
+      return {
+        status: true,
+        message: "delete success",
+        data: null
+      }
+    }
   }
+
+
 }
