@@ -102,7 +102,7 @@ export class CustomersService {
             const formartVoucherHistory = {
               ...voucherHistoryDto,
               appointmentId: Number(appointmentRes.id),
-              customerId: Number(customerRes.id)
+              customerId: Number(findCustomer.id)
             }
             let resultVoucherHistory = await this.voucherHistorySer.save(formartVoucherHistory)
             console.log("resultVoucherHistory",resultVoucherHistory);
