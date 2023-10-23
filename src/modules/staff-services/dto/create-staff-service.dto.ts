@@ -1,9 +1,11 @@
-import { Allow } from "class-validator";
+import { Allow, IsNotEmpty, IsNumber } from "class-validator";
 
 export class CreateStaffServiceDto {
-    @Allow()
-    staffId: string
 
-    @Allow()
-    serviceId: string
+    @IsNotEmpty()
+    serviceId: number
+
+    @IsNotEmpty()
+    staffId: number
+
 }

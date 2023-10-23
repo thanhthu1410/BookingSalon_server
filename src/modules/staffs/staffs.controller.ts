@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res, HttpException, HttpStatus, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res, HttpException, HttpStatus, Req, ParseIntPipe, Query } from '@nestjs/common';
 import { StaffsService } from './staffs.service';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { uploadFileToStorage } from 'src/firebase';
+import { PaginationDto } from './dto/pagination-staff.dto';
 
 
 @Controller('staffs')
@@ -19,7 +20,7 @@ export class StaffsController {
     // console.log("body.staff:", body.staff)
     // console.log("file", file);
     let avatar = await uploadFileToStorage(file, "staff", file?.buffer)
-    console.log("avatar", avatar);
+    // console.log("avatar", avatar);
 
     const newData = {
       ...data,
@@ -38,15 +39,40 @@ export class StaffsController {
   }
 
   @Get()
-  async findAll(@Res() res: Response,) {
+  async findAll(@Res() res: Response, @Query("skip", ParseIntPipe) skip: number, @Query("take", ParseIntPipe) take: number) {
     try {
-      let staffRes = await this.staffsService.findAll()
+      let pagination: PaginationDto = {
+        skip,
+        take
+      }
+      let staffRes = await this.staffsService.findAll(pagination)
       res.statusMessage = staffRes.message
       res.status(staffRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(staffRes)
     } catch (err) {
-      console.log("err:", err)
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
     }
+  }
+
+  @Get('search')
+  async findAllService(@Res() res: Response, @Query('q') q: string) {
+
+    if (q != undefined) {
+      try {
+        return res.status(HttpStatus.OK).json(await this.staffsService.searchByName(q))
+      } catch (err) {
+        throw new HttpException('Loi Controller', HttpStatus.BAD_REQUEST);
+      }
+
+    } else {
+      try {
+        let serviceResAll = await this.staffsService.findStaff()
+        res.statusMessage = serviceResAll.message
+        res.status(serviceResAll.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(serviceResAll)
+      } catch (err) {
+        throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
+      }
+    }
+
   }
 
   @Get(':id')
@@ -61,7 +87,7 @@ export class StaffsController {
       let data;
       if (body.staff) {
         data = JSON.parse(body.staff);
-        console.log("data", data);
+        // console.log("data", data);
       }
       if (file) {
         let url = await uploadFileToStorage(file, "staff", file?.buffer)
@@ -71,21 +97,18 @@ export class StaffsController {
         }
         let staffRes = await this.staffsService.update(id, data);
         if (staffRes) {
-          return res.status(HttpStatus.OK).json(staffRes);
+          res.statusMessage = staffRes.message
+          res.status(staffRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(staffRes)
         }
       } else {
         let staffRes = await this.staffsService.update(id, data);
         if (staffRes) {
-          return res.status(HttpStatus.OK).json(staffRes);
+          res.statusMessage = staffRes.message
+          res.status(staffRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(staffRes)
         }
       }
-
-      // console.log(" staffRes:", staffRes)
-
-
     } catch (err) {
-      console.log(" err:", err)
-      throw new HttpException('Loi Controller', HttpStatus.BAD_REQUEST);
+      throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
     }
   }
 

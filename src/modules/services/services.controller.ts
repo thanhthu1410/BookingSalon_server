@@ -70,20 +70,40 @@ export class ServicesController {
   @Patch(':id')
   @UseInterceptors(FileInterceptor('avatar'))
   async update(@Res() res: Response, @Req() req: Request, @Param('id') id: number, @Body() body: any, updateServiceDto: UpdateServiceDto, @UploadedFile() file: Express.Multer.File) {
-    // console.log("updatedata", body.services);
-    updateServiceDto = JSON.parse(body.services)
+    console.log("updatedata");
+    // updateServiceDto = JSON.parse(body.services)
     try {
+      let updateServiceDto;
+      if (body.services) {
+        updateServiceDto = JSON.parse(body.services)
+      }
       if (file) {
         let url = await uploadFileToStorage(file, "service", file?.buffer)
-        updateServiceDto.avatar = url;
+        updateServiceDto = {
+          ...updateServiceDto,
+          avatar: url
+        }
+        let serviceRes = await this.servicesService.update(id, updateServiceDto);
+        console.log("serviceRes", serviceRes);
+
+
+        if (serviceRes) {
+          res.statusMessage = serviceRes.message
+          res.status(serviceRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(serviceRes)
+
+        }
+
+
+      } else {
+        let serviceRes = await this.servicesService.update(id, updateServiceDto);
+        if (serviceRes) {
+          res.statusMessage = serviceRes.message
+          res.status(serviceRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(serviceRes)
+        }
       }
-      let serviceRes = await this.servicesService.update(id, updateServiceDto);
-      if (serviceRes) {
-        return res.status(HttpStatus.OK).json(serviceRes);
-      }
+
     } catch (err) {
-      console.error('Error in image upload:', err);
-      throw new HttpException('Loi Controller', HttpStatus.BAD_REQUEST);
+      throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
     }
 
   }
@@ -101,6 +121,8 @@ export class ServicesController {
     try {
       let serviceRes = await this.servicesService.remove(id)
       res.status(serviceRes ? HttpStatus.OK : HttpStatus.ACCEPTED).json(serviceRes)
+      res.statusMessage = serviceRes.message
+
     } catch (err) {
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
     }
