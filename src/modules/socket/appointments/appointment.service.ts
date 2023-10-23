@@ -21,64 +21,128 @@ export class AppointmentService {
     ) { }
     async create(createCustomerDto: CreateCustomerDto, createAppointmentDto: any, createAppointmentDetailDto: CreateAppointmentDetailDto[], voucherHistoryDto?: CreateVoucherHistoryDto, useVoucher?: any) {
         try {
-            let customerRes = await this.customer.save(createCustomerDto);
-            // console.log("customerRes", customerRes);
-
-            if (!customerRes) return {
+            let customerRes ;
+            const findCustomer = await this.customer.findOne({
+              where:{
+                email: createCustomerDto.email
+              }
+            })
+            if(!findCustomer) {
+               customerRes = await this.customer.save(createCustomerDto);
+              console.log("customerRes", customerRes);
+              if (!customerRes) return {
                 status: false,
-                message: "Error"
-            }
-            if (customerRes) {
-                let formatAppointment = {
-                    ...createAppointmentDto,
-                    customerId: customerRes.id
+                message: "Error al crear el cliente"
+              }
+              if (customerRes) {
+                let formartAppointment = {
+                  ...createAppointmentDto,
+                  customerId: customerRes.id
                 }
-                let appointmentRes = await this.appointment.save(formatAppointment)
-                if (!appointmentRes) throw new Error('Error')
-
+                let appointmentRes = await this.appointment.save(formartAppointment)
+                console.log("appointmentRes", appointmentRes);
+                if (!appointmentRes) throw new Error('Error al crear cita')
+        
                 if (appointmentRes) {
-
-                    if (voucherHistoryDto) {
-                        console.log("voucherHistoryDto", voucherHistoryDto);
-                        const formatVoucherHistory = {
-                            ...voucherHistoryDto,
-                            appointmentId: Number(appointmentRes.id),
-                            customerId: Number(customerRes.id)
-                        }
-                        let resultVoucherHistory = await this.voucherHistory.save(formatVoucherHistory)
-                        console.log("resultVoucherHistory", resultVoucherHistory);
-                        if (resultVoucherHistory) {
-                            let updateVoucherUsed = {
-                                ...useVoucher,
-                                status: true
-                            }
-                            let updatedVoucher = this.voucher.merge(useVoucher, updateVoucherUsed);
-                            let resultUpdateVoucher = await this.voucher.save(updatedVoucher)
-                        }
+                  // chekck xem co voucher hay khong !
+                  if(voucherHistoryDto){
+                    console.log("voucherHistoryDto",voucherHistoryDto);
+                    const formartVoucherHistory = {
+                      ...voucherHistoryDto,
+                      appointmentId: Number(appointmentRes.id),
+                      customerId: Number(customerRes.id)
                     }
-                    for (let i in createAppointmentDetailDto) {
-                        createAppointmentDetailDto[i] = {
-                            ...createAppointmentDetailDto[i],
-                            appointmentId: appointmentRes.id
-                        }
+                    let resultVoucherHistory = await this.voucherHistory.save(formartVoucherHistory)
+                    console.log("resultVoucherHistory",resultVoucherHistory);
+                    if(resultVoucherHistory){
+                      let updateVoucherUsed = {
+                        ...useVoucher,
+                        status: true
+                      }
+                      let updatedVoucher = this.voucher.merge(useVoucher,updateVoucherUsed);
+                      let resultUpdateVoucher = await this.voucher.save(updatedVoucher) 
                     }
-                    let resultAppointmentDetailRes = await Promise.all(createAppointmentDetailDto.map(async (detail) => await this.appointmentDetail.save(detail)));
-
-                    return {
-                        status: true,
-                        message: "create booking successfully",
-                        customer: customerRes,
-                        appointment: appointmentRes,
-                        details: resultAppointmentDetailRes
+                  }
+                  for (let i in createAppointmentDetailDto) {
+                    createAppointmentDetailDto[i] = {
+                      ...createAppointmentDetailDto[i],
+                      appointmentId: appointmentRes.id
                     }
+                  }
+                  let resultAppomentDetailRes = await Promise.all(createAppointmentDetailDto.map(async(detail) => await this.appointmentDetail.save(detail)))
+        
+                  return {
+                    status: true,
+                    message: "create booking successfull ",
+                    customer: customerRes,
+                    appoiment: appointmentRes,
+                    details: resultAppomentDetailRes
+               
+                  }
                 }
+                
+              }
+            }else{
+              let formartAppointment = {
+                ...createAppointmentDto,
+                customerId: findCustomer.id
+              }
+              let appointmentRes = await this.appointment.save(formartAppointment)
+              console.log("appointmentRes", appointmentRes);
+              if (!appointmentRes) throw new Error('Error al crear cita')
+      
+              if (appointmentRes) {
+                // chekck xem co voucher hay khong !
+                if(voucherHistoryDto){
+                  console.log("voucherHistoryDto",voucherHistoryDto);
+                  const formartVoucherHistory = {
+                    ...voucherHistoryDto,
+                    appointmentId: Number(appointmentRes.id),
+                    customerId: Number(customerRes.id)
+                  }
+                  let resultVoucherHistory = await this.voucherHistory.save(formartVoucherHistory)
+                  console.log("resultVoucherHistory",resultVoucherHistory);
+                  if(resultVoucherHistory){
+                    let updateVoucherUsed = {
+                      ...useVoucher,
+                      status: true
+                    }
+                    let updatedVoucher = this.voucher.merge(useVoucher,updateVoucherUsed);
+                    let resultUpdateVoucher = await this.voucher.save(updatedVoucher) 
+                  }
+                }
+                for (let i in createAppointmentDetailDto) {
+                  createAppointmentDetailDto[i] = {
+                    ...createAppointmentDetailDto[i],
+                    appointmentId: appointmentRes.id
+                  }
+                }
+                let resultAppomentDetailRes = await Promise.all(createAppointmentDetailDto.map(async(detail) => await this.appointmentDetail.save(detail)))
+      
+                return {
+                  status: true,
+                  message: "create booking successfull ",
+                  customer: customerRes,
+                  appoiment: appointmentRes,
+                  details: resultAppomentDetailRes
+             
+                }
+              }
+              
+            
+      
             }
+           
+      
+          
             return {
-                status: true,
-                message: "Create Appointment Successfully"
+              status: true,
+              message: "create booking okey",
+              
+      
             }
-
-        } catch (err) {
+          
+          } catch (err) {
             console.log("err", err);
 
             return {
