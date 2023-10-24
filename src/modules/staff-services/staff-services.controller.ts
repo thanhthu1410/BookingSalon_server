@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpException, HttpStatus, Req } from '@nestjs/common';
 import { StaffServicesService } from './staff-services.service';
 import { CreateStaffServiceDto } from './dto/create-staff-service.dto';
 import { UpdateStaffServiceDto } from './dto/update-staff-service.dto';
@@ -9,16 +9,13 @@ export class StaffServicesController {
   constructor(private readonly staffServicesService: StaffServicesService) { }
 
   @Post()
-  async create(@Body() createStaffServiceDto: CreateStaffServiceDto, @Res() res: Response) {
+  async create(@Res() res: Response, @Body() createStaffServiceDto: CreateStaffServiceDto) {
     try {
-      let [status, message, data] = await this.staffServicesService.create(createStaffServiceDto);
-      return res.status(status ? 200 : 213).json({
-        message,
-        data
-      })
+      let StaffServiceRes = await this.staffServicesService.create(createStaffServiceDto)
+      res.statusMessage = StaffServiceRes.message
+      res.status(StaffServiceRes.status ? HttpStatus.OK : HttpStatus.ACCEPTED).json(StaffServiceRes)
     } catch (err) {
-      console.log("err", err);
-      throw new HttpException('loi controller', HttpStatus.BAD_REQUEST);
+      throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
     }
   }
 
@@ -28,8 +25,16 @@ export class StaffServicesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.staffServicesService.findOne(+id);
+  async findOne(@Param('id') id: number, @Res() res: Response) {
+    try {
+
+      let staffServiceerviceRes = await this.staffServicesService.findOne(id)
+      res.statusMessage = staffServiceerviceRes.message
+      res.status(staffServiceerviceRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(staffServiceerviceRes.data)
+    } catch (err) {
+      throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
+    }
+
   }
 
   @Patch(':id')
@@ -38,7 +43,18 @@ export class StaffServicesController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.staffServicesService.remove(+id);
+  async remove(@Param('id') id: number, @Res() res: Response) {
+    try {
+      let StaffServiceRes = await this.staffServicesService.remove(id)
+      // console.log("StaffServiceRes:", StaffServiceRes)
+      res.statusMessage = StaffServiceRes.message
+      res.status(StaffServiceRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(StaffServiceRes)
+    } catch (err) {
+      //console.log(" err: controller", err)
+      throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
+
+    }
   }
+
+
 }
