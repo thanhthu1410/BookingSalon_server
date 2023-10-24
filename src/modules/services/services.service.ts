@@ -85,7 +85,11 @@ export class ServicesService {
         take: pagination.take,
       })
 
-      let countItem = (await this.serviceRepository.find()).length
+      let countItem = (await this.serviceRepository.find({
+        where: {
+          isDelete: false,
+        },
+      })).length
       let maxPage = Math.ceil(countItem / pagination.take)
       return {
         message: 'successful',
