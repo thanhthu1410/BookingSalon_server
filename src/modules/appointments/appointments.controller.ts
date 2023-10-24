@@ -5,7 +5,7 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 
 @Controller('appointments')
 export class AppointmentsController {
-  constructor(private readonly appointmentsService: AppointmentsService) {}
+  constructor(private readonly appointmentsService: AppointmentsService) { }
 
   @Post()
   create(@Body() createAppointmentDto: CreateAppointmentDto) {
@@ -25,6 +25,12 @@ export class AppointmentsController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAppointmentDto: UpdateAppointmentDto) {
     return this.appointmentsService.update(+id);
+  }
+
+  @Patch('information/:id')
+  updateInformation(@Param('id') id: number, @Body() updateAppointmentDto: UpdateAppointmentDto) {
+    console.log("da vao controller")
+    return this.appointmentsService.updateInformation(id, updateAppointmentDto);
   }
 
   @Delete(':id')
