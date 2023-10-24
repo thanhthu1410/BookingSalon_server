@@ -1,5 +1,6 @@
 export enum AppointmentStatus {
     PENDING = 'PENDING',
     ACCEPTED = 'ACCEPTED',
-    DONE = 'DONE'
+    DONE = 'DONE',
+    REJECTED = 'REJECTED'
 }
