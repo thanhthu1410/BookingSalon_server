@@ -31,8 +31,28 @@ export class AppointmentsService {
     return res;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} appointment`;
+ 
+
+  
+  async acceptAppointment(id: number) {
+    const res = await this.appointmentRepository.findOne({where:{id:id},
+      relations:{
+        appointmentDetails:{
+          staff: true,
+          service:true
+        },
+        customer:true,
+        
+      }})
+    if(res.status!=AppointmentStatus.PENDING){
+      return await ejs.renderFile("acceptedConfirm.ejs")
+    }
+    const resUpdate = this.appointmentRepository.merge(res,{
+      status: AppointmentStatus.ACCEPTED
+
+    })
+    const resResult = await this.appointmentRepository.save(resUpdate)
+    return resResult? await ejs.renderFile("emailActived.ejs") : "Xác thực thất bại, vui lòng thử lại!";
   }
 
   async update(id: number) {
@@ -52,7 +72,6 @@ export class AppointmentsService {
 
     })
     const resResult = await this.appointmentRepository.save(resUpdate)
-    console.log("🚀 ~ file: appointments.service.ts:47 ~ AppointmentsService ~ update ~ resResult:aa", )
     var data = {
       customerName:resResult.customer.fullName,
       date:resResult.date,
@@ -71,7 +90,7 @@ export class AppointmentsService {
      
     // Tạo tệp PDF từ HTML đã được tạo ra 
     await pdf.create(html, options).toFile('./businesscard.pdf', function(err, res) {
-      if (err) return console.log(err);
+      if (err) return console.log(err); 
       console.log(res); // { filename: './businesscard.pdf' }
     });
     console.log("🚀 ~ file: appointments.service.ts:69 ~ AppointmentsService ~ pdf.create ~ pdf:", pdf)

@@ -29,12 +29,15 @@ export class MailService {
                 }
             });
 
-            await transporter.sendMail({
+             await transporter.sendMail({
                 from: process.env.MS_USER,
                 ...mailOption
             });
+           
+            
             return true
         } catch (err) {
+          
             return false
         }
     }

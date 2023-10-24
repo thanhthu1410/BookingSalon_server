@@ -42,16 +42,19 @@ export class AppointmentService {
                 let appointmentRes = await this.appointment.save(formartAppointment)
                 console.log("appointmentRes", appointmentRes);
                 if (!appointmentRes) throw new Error('Error al crear cita')
-        
                 if (appointmentRes) {
                   // chekck xem co voucher hay khong !
                   if(voucherHistoryDto){
                     console.log("voucherHistoryDto",voucherHistoryDto);
+                   
+                    
                     const formartVoucherHistory = {
                       ...voucherHistoryDto,
                       appointmentId: Number(appointmentRes.id),
                       customerId: Number(customerRes.id)
                     }
+                    console.log("🚀 ~ file: appointment.service.ts:51 ~ AppointmentService ~ create ~ formartVoucherHistory:", formartVoucherHistory)
+
                     let resultVoucherHistory = await this.voucherHistory.save(formartVoucherHistory)
                     console.log("resultVoucherHistory",resultVoucherHistory);
                     if(resultVoucherHistory){
@@ -98,7 +101,7 @@ export class AppointmentService {
                   const formartVoucherHistory = {
                     ...voucherHistoryDto,
                     appointmentId: Number(appointmentRes.id),
-                    customerId: Number(customerRes.id)
+                    customerId: Number(findCustomer.id)
                   }
                   let resultVoucherHistory = await this.voucherHistory.save(formartVoucherHistory)
                   console.log("resultVoucherHistory",resultVoucherHistory);
@@ -122,7 +125,7 @@ export class AppointmentService {
                 return {
                   status: true,
                   message: "create booking successfull ",
-                  customer: customerRes,
+                  customer: findCustomer,
                   appoiment: appointmentRes,
                   details: resultAppomentDetailRes
              
@@ -170,5 +173,17 @@ export class AppointmentService {
                 data: null
             }
         }
+    }
+    async findOne(id: number) {
+      const res = await this.appointment.findOne({where:{id:id},
+        relations:{
+          appointmentDetails:{
+            staff: true,
+            service:true
+          },
+          customer:true,
+          
+        }})
+      return res;
     }
 }
