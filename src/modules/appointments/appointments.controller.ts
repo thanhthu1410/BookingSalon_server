@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { Response } from 'express';
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -18,8 +19,13 @@ export class AppointmentsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.appointmentsService.acceptAppointment(+id);
+  async findOne(@Param('id') id: string, @Res() res: Response) {
+    console.log("idAccept", id);
+    let result = await this.appointmentsService.acceptAppointment(+id);
+    if (!result) return false
+
+    return res.status(HttpStatus.OK).json(result)
+
   }
 
   @Patch(':id')
