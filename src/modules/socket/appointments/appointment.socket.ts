@@ -73,7 +73,12 @@ export class AppointmentSocketGateWay implements OnModuleInit {
                 } catch (err) {
                     console.log("err", err);
                 }
-
+            })
+            socket.on("acceptBooking", async (body) => {
+                for (let i in this.clients) {
+                    this.clients[i].socket.emit("listAppointments", body);
+                }
+                socket.emit("listAppointments", body);
             })
         }))
     }
@@ -181,5 +186,8 @@ export class AppointmentSocketGateWay implements OnModuleInit {
                 message: "Lỗi controller"
             }
         }
+    }
+    async hanldeUpdateBooking ( ) {
+
     }
 }
