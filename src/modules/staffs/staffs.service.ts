@@ -99,7 +99,6 @@ export class StaffsService {
             staff: true,
             service: true
           },
-          //appointmentDetails: true
         }
 
       })
@@ -145,19 +144,16 @@ export class StaffsService {
         where: { id },
 
         relations: {
-          //appointmentDetails: true,
           staffServices: {
             service: true
           },
 
         }
       })
-      //console.log("data :", data)
       if (!data) return false
 
       let newData = this.StaffRepository.merge(data, updateStaffDto)
       let result = await this.StaffRepository.save(newData)
-      // console.log("result:", result)
       return {
         status: true,
         message: 'update successful',
@@ -181,13 +177,8 @@ export class StaffsService {
         ...oldStaff,
         IsDelete: true
       }
-      //  console.log("newstaff:", newstaff)
       const result = this.StaffRepository.merge(oldStaff, newstaff)
-      //console.log("result:", result)
-
       const updateResult = await this.StaffRepository.save(result)
-      // console.log("updateStaff", updateResult);
-
       if (updateResult) {
         return {
           status: true,

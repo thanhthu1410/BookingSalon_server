@@ -28,7 +28,16 @@ export class AppointmentsService {
 
       }
     })
-    return res;
+   if(!res) return  {
+    status: false,
+    message: "get fail ",
+    data: null
+  }
+  return  {
+    status: true,
+    message: "accept successfull ! ",
+    data: res
+  }
   }
 
 
@@ -54,7 +63,19 @@ export class AppointmentsService {
 
     })
     const resResult = await this.appointmentRepository.save(resUpdate)
-    return resResult ? await ejs.renderFile("emailActived.ejs") : "Xác thực thất bại, vui lòng thử lại!";
+    console.log("resResult",resResult);
+    
+    if(!resResult) return {
+      status: false,
+      message: "Failed to accept",
+      data: null
+    }
+    return {
+      status: true,
+      message: "accept successfull ! ",
+      data: resResult
+    }
+    
   }
 
   async update(id: number) {
@@ -95,9 +116,8 @@ export class AppointmentsService {
     // Tạo tệp PDF từ HTML đã được tạo ra 
     await pdf.create(html, options).toFile('./businesscard.pdf', function (err, res) {
       if (err) return console.log(err);
-      console.log(res); // { filename: './businesscard.pdf' }
     });
-    console.log("🚀 ~ file: appointments.service.ts:69 ~ AppointmentsService ~ pdf.create ~ pdf:", pdf)
+
     // resResult là dữ liệu đầu vào sao khi bấm thay đổi data base thành recipt
     // sau dó lam handle gửi mail kèm pdf
     this.mail.sendMail({

@@ -34,14 +34,13 @@ export class CustomersController {
         // tinh tien khi co voucher vs type cash
       if(body.voucher.discountType == "cash" ){
         totalNotVoucherBefore = totalNotVoucherAfter - (Number(body?.voucher?.value))
-        console.log("totalNotVoucherBefore",totalNotVoucherBefore);
          // tinh tien khi co voucher vs type cash & total < value discount
         if(totalNotVoucherBefore < 0) {
            totalNotVoucherBefore = 0
         }
          // tinh tien khi co voucher vs type percent
       }else if(body.voucher.discountType == "percent" ){
-        console.log("percent",body.voucher.discountType);
+
          totalNotVoucherBefore = totalNotVoucherAfter - (totalNotVoucherAfter * (Number(body?.voucher?.value)) * 0.01)
       }
     }
@@ -54,13 +53,11 @@ export class CustomersController {
     const formatAppoimentDetail = body?.details;
     let voucherHistoryData:any;
     if(body?.voucher) {
-      console.log("voucher",body?.voucher);
       voucherHistoryData = {
         voucherId: body?.voucher?.id
       }
     }
     let result = await this.customersService.create(customerData, appointmentData,formatAppoimentDetail,voucherHistoryData,body?.voucher )
-    console.log("result",result);
     return res.status(result.status ? 200 :213).json(result.message)
   }
   @Get()

@@ -9,7 +9,6 @@ interface MailBody {
 }
 
 function genEmailString(mailBody: MailBody) {
-    console.log("vao mail ne");
     
     let mailGenerator = new Mailgen({
         theme: 'default',

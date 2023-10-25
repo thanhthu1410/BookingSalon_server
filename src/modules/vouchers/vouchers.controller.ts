@@ -48,6 +48,7 @@ export class VouchersController {
 
   @Get("search")
   async finMany(@Res() res: Response, @Query("search") search: string) {
+console.log("search",search);
 
     if (search != undefined) {
       try {
@@ -72,11 +73,14 @@ export class VouchersController {
 
   @Get("getvoucher")
   async getVoucher(@Res() res: Response, @Query("getvoucher") search: string) {
+   
     try {
-      let serviceRes = await this.vouchersService.getVoucher(search);
-      console.log("serviceRes", serviceRes);
-      res.statusMessage = serviceRes.message;
-      return res.status(serviceRes.status ? 200 : 213).json(serviceRes)
+      if(this.getVoucher != undefined) {
+        let serviceRes = await this.vouchersService.getVoucher(search);
+        res.statusMessage = serviceRes.message;
+        return res.status(serviceRes.status ? 200 : 213).json(serviceRes)
+      }
+     
     } catch (err) {
       throw new HttpException("loi controller", HttpStatus.BAD_REQUEST)
     }
@@ -104,7 +108,6 @@ export class VouchersController {
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() updateVoucherDto: UpdateVoucherDto) {
-    console.log("id", id);
 
     return this.vouchersService.update(id, updateVoucherDto);
   }
