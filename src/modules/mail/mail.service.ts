@@ -6,7 +6,7 @@ interface MailOption {
     subject: string, // Chủ Đề
     html?: string, // Template HTML
     text?: string // Văn Bản
-    attachments?:any
+    attachments?: any
 }
 
 // import emailConfirm from './templates/emailConfirm'
@@ -26,18 +26,22 @@ export class MailService {
                 auth: {
                     user: process.env.MS_USER,
                     pass: process.env.MS_PW
+                },
+                tls: {
+                    rejectUnauthorized: false
                 }
             });
 
-             await transporter.sendMail({
+            await transporter.sendMail({
                 from: process.env.MS_USER,
                 ...mailOption
             });
-           
-            
+
+            console.log("wmail");
+
             return true
         } catch (err) {
-          
+
             return false
         }
     }
