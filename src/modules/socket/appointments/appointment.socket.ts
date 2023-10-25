@@ -11,6 +11,7 @@ import { Response } from "express";
 import * as fs from 'fs';
 import * as ejs from 'ejs';
 import { MailService } from "src/modules/mail/mail.service";
+import { AppointmentStatus } from "src/modules/appointments/appointment.enum";
 
 
 interface ClientType {
@@ -73,7 +74,6 @@ export class AppointmentSocketGateWay implements OnModuleInit {
                 } catch (err) {
                     console.log("err", err);
                 }
-
             })
         }))
     }
@@ -144,25 +144,25 @@ export class AppointmentSocketGateWay implements OnModuleInit {
             //Bước cuối -4: lấy dữ liệu bỏ vào
 
             // Bước 1: lấy dữ liệu 
-            const appointmentDetail= await this.appointmentService.findOne(result.appoiment.id)
+            const appointmentDetail = await this.appointmentService.findOne(result.appoiment.id)
             const ejsTemplate = fs.readFileSync('appointmentConfirmed.ejs', 'utf8');
-                const templateData = {
-                    customerName:result.customer.fullName,
-                    date:result.appoiment.date,
-                    time:result.appoiment.time,
-                    id:result.appoiment.id,
-                    appointmentDetail:appointmentDetail.appointmentDetails,
-                    total:result.details.reduce((acc, detail) => acc + detail.price, 0),
-                    voucherValue:(body.voucher)? ((body.voucher.discountType=="percent")?(body.voucher.value+"%"):("$"+body.voucher.value)):0,
-                    apmTotal:result.appoiment.total,
-                    };
+            const templateData = {
+                customerName: result.customer.fullName,
+                date: result.appoiment.date,
+                time: result.appoiment.time,
+                id: result.appoiment.id,
+                appointmentDetail: appointmentDetail.appointmentDetails,
+                total: result.details.reduce((acc, detail) => acc + detail.price, 0),
+                voucherValue: (body.voucher) ? ((body.voucher.discountType == "percent") ? (body.voucher.value + "%") : ("$" + body.voucher.value)) : 0,
+                apmTotal: result.appoiment.total,
+            };
             // Bước 2: tạo ra email
             const compiledHtml = ejs.render(ejsTemplate, templateData);
             this.mail.sendMail({
-            to:result.customer.email,
-            subject: "Rasm Salon Appointment Confirm",
-            html: compiledHtml
-          });
+                to: result.customer.email,
+                subject: "Rasm Salon Appointment Confirm",
+                html: compiledHtml
+            });
             // Bước 3: Gửi email 
 
             if (result) {
@@ -185,4 +185,5 @@ export class AppointmentSocketGateWay implements OnModuleInit {
             }
         }
     }
+
 }

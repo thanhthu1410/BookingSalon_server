@@ -11,14 +11,17 @@
 
 <body>
     <div class="d-flex align-items-center justify-content-center vh-100">
-        <div class="text-center" style="padding: 20px; width: 500px; margin: 0 auto; background-color: rgb(249, 243, 240)">
+        <div class="text-center"
+            style="padding: 20px; width: 500px; margin: 0 auto; background-color: rgb(249, 243, 240)">
             <h2 style="color: #333; font-size: 24px; font-weight: bold;">Appointment Confirmed</h2>
             <p style="color: #333; font-size: 14px;">Dear <%= customerName %>,</p>
             <p style="color: #333; font-size: 14px;">Your appointment at Rasm Salon has been successfully confirmed.</p>
 
             <h3 style="color: hsl(21, 43%, 58%); font-size: 18px;">Appointment Details:</h3>
-            <p style="color: #333; font-size: 14px;">Date: <%= date %></p>
-            <p style="color: #333; font-size: 14px;">Time: <%= time %></p>
+            <p style="color: #333; font-size: 14px;">Date: <%= date %>
+            </p>
+            <p style="color: #333; font-size: 14px;">Time: <%= time %>
+            </p>
 
             <h3 style="color: hsl(21, 43%, 58%); font-size: 18px;">Services:</h3>
             <table style="border-collapse: collapse; width: 100%;">
@@ -28,32 +31,50 @@
                     <th style="border: 1px solid #000; padding: 10px;">Staff</th>
                     <th style="border: 1px solid #000; padding: 10px;">Price</th>
                 </tr>
-                <% for (let i = 0; i < appointmentDetail.length; i++) { %>
+                <% for (let i=0; i < appointmentDetail.length; i++) { %>
                     <tr>
-                        <td style="border: 1px solid #000; padding: 10px;"><%= i + 1 %></td>
-                        <td style="border: 1px solid #000; padding: 10px;"><%= appointmentDetail[i].service.name %></td>
-                        <td style="border: 1px solid #000; padding: 10px;"><%= appointmentDetail[i].staff.name %></td>
-                        <td style="border: 1px solid #000; padding: 10px;"><%= appointmentDetail[i].price %></td>
+                        <td style="border: 1px solid #000; padding: 10px;">
+                            <%= i + 1 %>
+                        </td>
+                        <td style="border: 1px solid #000; padding: 10px;">
+                            <%= appointmentDetail[i].service.name %>
+                        </td>
+                        <td style="border: 1px solid #000; padding: 10px;">
+                            <%= appointmentDetail[i].staff.name %>
+                        </td>
+                        <td style="border: 1px solid #000; padding: 10px;">
+                            <%= appointmentDetail[i].price %>
+                        </td>
                     </tr>
-                <% } %>
+                    <% } %>
             </table>
 
-            <p style="color: #333; font-size: 14px;">Total: $<%= total %></p>
-            <p style="color: #333; font-size: 14px;">You have received a  <%= voucherValue %> discount from the voucher</p>
-            <p style="color: #333; font-size: 14px;">Final amount after discount: $<%= apmTotal %></p>
-            <p style="color: #333; font-size: 14px;">Please confirm your appointment by clicking the appropriate button below:</p>
+            <p style="color: #333; font-size: 14px;">Total: $<%= total %>
+            </p>
+            <p style="color: #333; font-size: 14px;">You have received a <%= voucherValue %> discount from the voucher
+            </p>
+            <p style="color: #333; font-size: 14px;">Final amount after discount: $<%= apmTotal %>
+            </p>
+            <p style="color: #333; font-size: 14px;">Please confirm your appointment by clicking the appropriate button
+                below:</p>
             <div style="display: flex; width: 80%; justify-content: space-around !important; align-items: center;">
-            <a  href="http://localhost:3000/api/v1/appointments/<%= id %>" style="text-decoration: none; background-color: #3a93f1; color: #fff; padding: 10px 20px;  margin-left: 120px; display: inline-block; border-radius: 5px;">Accept</a>
-            <a  href="http://localhost:5173" style="text-decoration: none; background-color: #f80000; color: #fff; padding: 10px 20px;  margin-left: 120px; display: inline-block; border-radius: 5px;">Cancel</a>
+                <a href="http://localhost:3000/api/v1/appointments/<%= id %>"
+                    style="text-decoration: none; background-color: #3a93f1; color: #fff; padding: 10px 20px;  margin-left: 120px; display: inline-block; border-radius: 5px;">Accept</a>
+                <a href="http://localhost:5173"
+                    style="text-decoration: none; background-color: #f80000; color: #fff; padding: 10px 20px;  margin-left: 120px; display: inline-block; border-radius: 5px;">Cancel</a>
             </div>
-            <p style="color: #333; font-size: 14px;">We look forward to providing you with these services and ensuring your experience with us is exceptional. If you need to make any changes to your appointment or have any questions, please don't hesitate to contact us.</p>
-            <p style="color: #333; font-size: 14px;">Thank you for choosing [Your Business Name]. We appreciate your trust and look forward to serving you.</p>
+            <p style="color: #333; font-size: 14px;">We look forward to providing you with these services and ensuring
+                your experience with us is exceptional. If you need to make any changes to your appointment or have any
+                questions, please don't hesitate to contact us.</p>
+            <p style="color: #333; font-size: 14px;">Thank you for choosing [Your Business Name]. We appreciate your
+                trust and look forward to serving you.</p>
 
             <p style="color: #333; font-size: 14px;">Best regards,</p>
             <p style="color: #333; font-size: 14px;">Rasm Salon</p>
 
-           
+
         </div>
     </div>
 </body>
+
 </html>

@@ -19,4 +19,7 @@ export class Time {
 
     @Column()
     stepMinute: number
+
+    @Column()
+    reminderTime: number
 }
