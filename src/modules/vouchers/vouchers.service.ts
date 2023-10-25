@@ -49,7 +49,11 @@ export class VouchersService {
         take: pagination.take
       })
 
-      let countItem = (await this.voucherSer.find()).length
+      let countItem = (await this.voucherSer.find({
+        where:{
+          IsDelete: false
+        }
+      })).length
       let maxPage = Math.ceil(countItem / pagination.take)
       return {
         message: 'get voucher pagination successful',
