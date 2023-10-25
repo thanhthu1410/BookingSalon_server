@@ -7,11 +7,12 @@ import { AppointmentDetail } from "../appointment-details/entities/appointment-d
 import { AppointmentService } from "./appointments/appointment.service";
 import { Voucher } from "../vouchers/entities/voucher.entity";
 import { VoucherHistory } from "../voucher-history/entities/voucher-history.entity";
+import { MailService } from "../mail/mail.service";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Customer, Appointment, AppointmentDetail, Voucher, VoucherHistory])
     ],
-    providers: [AppointmentSocketGateWay, AppointmentService]
+    providers: [AppointmentSocketGateWay, AppointmentService,MailService]
 })
 export class SocketModule { }

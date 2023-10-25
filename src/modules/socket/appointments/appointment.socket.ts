@@ -8,6 +8,10 @@ import { AppointmentDetail } from "src/modules/appointment-details/entities/appo
 import { AppointmentService } from "./appointment.service";
 import { Repository } from "typeorm";
 import { Response } from "express";
+import * as fs from 'fs';
+import * as ejs from 'ejs';
+import { MailService } from "src/modules/mail/mail.service";
+
 
 interface ClientType {
     socket: Socket,
@@ -25,7 +29,8 @@ export class AppointmentSocketGateWay implements OnModuleInit {
         private readonly appointmentService: AppointmentService,
         @InjectRepository(Customer) private readonly customer: Repository<Customer>,
         @InjectRepository(Appointment) private readonly appointment: Repository<Appointment>,
-        @InjectRepository(AppointmentDetail) private readonly appointmentDetail: Repository<AppointmentDetail>
+        @InjectRepository(AppointmentDetail) private readonly appointmentDetail: Repository<AppointmentDetail>,
+        private readonly mail: MailService,
     ) { }
 
     onModuleInit() {
@@ -128,9 +133,38 @@ export class AppointmentSocketGateWay implements OnModuleInit {
             }
 
             let result = await this.appointmentService.create(customerData, appointmentData, formatAppointmentDetail, voucherHistoryData, body?.voucher);
+            // send email để người dùng xác nhận đặt lịch 
+            // Mục đích: người dùng có thể xác nhận lịch hẹn của mình thông qua email
+            //Bước cuối -1: Người dùng bấm xác nhận email thành công
+            //Bước cuối -2: Email được gửi tới 
+            //Bước cuối -3: Tạo ra email
+            //Bước cuối -4: lấy dữ liệu bỏ vào
+
+            // Bước 1: lấy dữ liệu 
+            const appointmentDetail= await this.appointmentService.findOne(result.appoiment.id)
+            const ejsTemplate = fs.readFileSync('appointmentConfirmed.ejs', 'utf8');
+                const templateData = {
+                    customerName:result.customer.fullName,
+                    date:result.appoiment.date,
+                    time:result.appoiment.time,
+                    id:result.appoiment.id,
+                    appointmentDetail:appointmentDetail.appointmentDetails,
+                    total:result.details.reduce((acc, detail) => acc + detail.price, 0),
+                    voucherValue:(body.voucher)? ((body.voucher.discountType=="percent")?(body.voucher.value+"%"):("$"+body.voucher.value)):0,
+                    apmTotal:result.appoiment.total,
+                    };
+            // Bước 2: tạo ra email
+            const compiledHtml = ejs.render(ejsTemplate, templateData);
+            this.mail.sendMail({
+            to:result.customer.email,
+            subject: "Rasm Salon Appointment Confirm",
+            html: compiledHtml
+          });
+            // Bước 3: Gửi email 
 
             if (result) {
                 let listAppointments = await this.appointmentService.findAll();
+
                 return {
                     status: true,
                     data: listAppointments

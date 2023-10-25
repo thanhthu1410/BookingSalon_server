@@ -27,7 +27,7 @@ export class CronjobsService {
       const [day, month, year] = apm[i].date.split('/');
       const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:00`;
       const timestamp = new Date(formattedDate).getTime();
-     if(timestamp-Date.now()>0&&timestamp-Date.now()<(1000*60*60)){ 
+     if(timestamp-Date.now()>0&&timestamp-Date.now()<(1000*60*60)&&apm[i].status=="ACCEPTED"){ 
       console.log("alll");
       
     //Bước 3: gửi email đến những lịch đủ điều kiện
@@ -42,7 +42,7 @@ export class CronjobsService {
           const compiledHtml = ejs.render(ejsTemplate, templateData);
             this.mail.sendMail({
             to: `${apm[i].customer.email}`,
-            subject: "OTP",
+            subject: "Rasm Salon Reminder Email",
             html: compiledHtml
     });
      }

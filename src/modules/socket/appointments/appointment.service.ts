@@ -43,11 +43,14 @@ export class AppointmentService {
                 if (appointmentRes) {
                   // chekck xem co voucher hay khong !
                   if(voucherHistoryDto){
+                    console.log("voucherHistoryDto",voucherHistoryDto);
                     const formartVoucherHistory = {
                       ...voucherHistoryDto,
                       appointmentId: Number(appointmentRes.id),
                       customerId: Number(customerRes.id)
                     }
+                    console.log("🚀 ~ file: appointment.service.ts:51 ~ AppointmentService ~ create ~ formartVoucherHistory:", formartVoucherHistory)
+
                     let resultVoucherHistory = await this.voucherHistory.save(formartVoucherHistory)
                     if(resultVoucherHistory){
                       let updateVoucherUsed = {
@@ -91,7 +94,7 @@ export class AppointmentService {
                   const formartVoucherHistory = {
                     ...voucherHistoryDto,
                     appointmentId: Number(appointmentRes.id),
-                    customerId: Number(customerRes.id)
+                    customerId: Number(findCustomer.id)
                   }
                   let resultVoucherHistory = await this.voucherHistory.save(formartVoucherHistory)
                   if(resultVoucherHistory){
@@ -114,7 +117,7 @@ export class AppointmentService {
                 return {
                   status: true,
                   message: "create booking successfull ",
-                  customer: customerRes,
+                  customer: findCustomer,
                   appoiment: appointmentRes,
                   details: resultAppomentDetailRes
              
@@ -162,5 +165,17 @@ export class AppointmentService {
                 data: null
             }
         }
+    }
+    async findOne(id: number) {
+      const res = await this.appointment.findOne({where:{id:id},
+        relations:{
+          appointmentDetails:{
+            staff: true,
+            service:true
+          },
+          customer:true,
+          
+        }})
+      return res;
     }
 }
