@@ -7,25 +7,25 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn
 export class VoucherHistory {
     @PrimaryGeneratedColumn()
     id: number
-   
+
     @Column()
     appointmentId: number
-    @OneToOne(() => Appointment )
-    @JoinColumn({name: "appointmentId"})
+    @OneToOne(() => Appointment)
+    @JoinColumn({ name: "appointmentId" })
     appointment: Appointment
 
     @Column()
     voucherId: number
-    @OneToOne(() => Voucher )
+    @OneToOne(() => Voucher)
     @JoinColumn({ name: 'voucherId' })
     voucher: Voucher
 
-    @Column()
+    @Column({ unique: false })
     customerId: number
-    @OneToOne(() => Customer )
-    @JoinColumn({ name: 'customerId' })
-    customer: Customer
+    // @OneToOne(() => Customer)
+    // @JoinColumn({ name: 'customerId' })
+    // customer: Customer
 
-    @Column({default: Date.now()})
+    @Column({ default: Date.now() })
     createAt: string
 }

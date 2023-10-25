@@ -17,4 +17,7 @@ export class UpdateTimeDto extends PartialType(CreateTimeDto) {
 
     @Allow()
     stepMinute: number
+
+    @Allow()
+    reminderTime: number
 }
