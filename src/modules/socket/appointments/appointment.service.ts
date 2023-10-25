@@ -37,7 +37,8 @@ export class AppointmentService {
               if (customerRes) {
                 let formartAppointment = {
                   ...createAppointmentDto,
-                  customerId: customerRes.id
+                  customerId: customerRes.id,
+                  voucherHistoryId:useVoucher ? useVoucher.id : null
                 }
                 let appointmentRes = await this.appointment.save(formartAppointment)
                 console.log("appointmentRes", appointmentRes);
@@ -46,8 +47,6 @@ export class AppointmentService {
                   // chekck xem co voucher hay khong !
                   if(voucherHistoryDto){
                     console.log("voucherHistoryDto",voucherHistoryDto);
-                   
-                    
                     const formartVoucherHistory = {
                       ...voucherHistoryDto,
                       appointmentId: Number(appointmentRes.id),
@@ -64,6 +63,8 @@ export class AppointmentService {
                       }
                       let updatedVoucher = this.voucher.merge(useVoucher,updateVoucherUsed);
                       let resultUpdateVoucher = await this.voucher.save(updatedVoucher) 
+                      
+                      
                     }
                   }
                   for (let i in createAppointmentDetailDto) {
@@ -86,12 +87,14 @@ export class AppointmentService {
                 
               }
             }else{
+
               let formartAppointment = {
                 ...createAppointmentDto,
-                customerId: findCustomer.id
+                customerId: findCustomer.id,
+                voucherHistoryId: useVoucher ? useVoucher.id : null
+             
               }
               let appointmentRes = await this.appointment.save(formartAppointment)
-              console.log("appointmentRes", appointmentRes);
               if (!appointmentRes) throw new Error('Error al crear cita')
       
               if (appointmentRes) {

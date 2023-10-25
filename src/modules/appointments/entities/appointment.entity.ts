@@ -1,7 +1,9 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { AppointmentStatus } from "../appointment.enum";
 import { Customer } from "src/modules/customers/entities/customer.entity";
 import { AppointmentDetail } from "src/modules/appointment-details/entities/appointment-detail.entity";
+import { VoucherHistory } from "src/modules/voucher-history/entities/voucher-history.entity";
+import { Voucher } from "src/modules/vouchers/entities/voucher.entity";
 
 @Entity()
 export class Appointment {
@@ -40,4 +42,13 @@ export class Appointment {
 
     @OneToMany(() => AppointmentDetail, (appointmentDetail) => appointmentDetail.appointment)
     appointmentDetails: AppointmentDetail[]
+
+    @Column(
+        {nullable: true}
+    )
+    voucherHistoryId: number
+    @OneToOne(() => Voucher)
+    @JoinColumn({ name: "voucherHistoryId" })
+    voucher: Voucher
+
 }
