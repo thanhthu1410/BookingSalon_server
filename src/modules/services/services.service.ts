@@ -123,15 +123,9 @@ export class ServicesService {
   async update(id: number, updateServiceDto: UpdateServiceDto) {
     try {
       let data = await this.serviceRepository.findOne({ where: { id } })
-      console.log("dataupdate", data);
-
       if (!data) return false
-      // console.log("updatedata", updateServiceDto);
-
       let newData = this.serviceRepository.merge(data, updateServiceDto)
       let result = await this.serviceRepository.save(newData)
-      console.log("result", result);
-
       return {
         status: true,
         message: "Update service Successfully!",
@@ -169,7 +163,6 @@ export class ServicesService {
         message: "Get service successfully"
       }
     } catch (err) {
-      console.log("err111111:", err)
       throw new HttpException('Loi Model', HttpStatus.BAD_REQUEST);
     }
   }

@@ -70,7 +70,6 @@ export class ServicesController {
   @Patch(':id')
   @UseInterceptors(FileInterceptor('avatar'))
   async update(@Res() res: Response, @Req() req: Request, @Param('id') id: number, @Body() body: any, updateServiceDto: UpdateServiceDto, @UploadedFile() file: Express.Multer.File) {
-    console.log("updatedata");
     // updateServiceDto = JSON.parse(body.services)
     try {
       let updateServiceDto;
@@ -84,9 +83,6 @@ export class ServicesController {
           avatar: url
         }
         let serviceRes = await this.servicesService.update(id, updateServiceDto);
-        console.log("serviceRes", serviceRes);
-
-
         if (serviceRes) {
           res.statusMessage = serviceRes.message
           res.status(serviceRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(serviceRes)

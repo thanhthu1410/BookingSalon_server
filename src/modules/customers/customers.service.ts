@@ -33,7 +33,6 @@ export class CustomersService {
       })
       if(!findCustomer) {
          customerRes = await this.customersSer.save(createCustomerDto);
-        console.log("customerRes", customerRes);
         if (!customerRes) return {
           status: false,
           message: "Error al crear el cliente"
@@ -44,21 +43,18 @@ export class CustomersService {
             customerId: customerRes.id
           }
           let appointmentRes = await this.appoimentSer.save(formartAppointment)
-          console.log("appointmentRes", appointmentRes);
           if (!appointmentRes) throw new Error('Error al crear cita')
   
           if (appointmentRes) {
             // chekck xem co voucher hay khong !
             if(voucherHistoryDto){
-              console.log("voucherHistoryDto",voucherHistoryDto);
               const formartVoucherHistory = {
                 ...voucherHistoryDto,
                 appointmentId: Number(appointmentRes.id),
                 customerId: Number(customerRes.id)
               }
               let resultVoucherHistory = await this.voucherHistorySer.save(formartVoucherHistory)
-              console.log("resultVoucherHistory",resultVoucherHistory);
-              if(resultVoucherHistory){
+                 if(resultVoucherHistory){
                 let updateVoucherUsed = {
                   ...useVoucher,
                   status: true
@@ -92,20 +88,17 @@ export class CustomersService {
           customerId: findCustomer.id
         }
         let appointmentRes = await this.appoimentSer.save(formartAppointment)
-        console.log("appointmentRes", appointmentRes);
         if (!appointmentRes) throw new Error('Error al crear cita')
 
         if (appointmentRes) {
           // chekck xem co voucher hay khong !
           if(voucherHistoryDto){
-            console.log("voucherHistoryDto",voucherHistoryDto);
             const formartVoucherHistory = {
               ...voucherHistoryDto,
               appointmentId: Number(appointmentRes.id),
               customerId: Number(findCustomer.id)
             }
             let resultVoucherHistory = await this.voucherHistorySer.save(formartVoucherHistory)
-            console.log("resultVoucherHistory",resultVoucherHistory);
             if(resultVoucherHistory){
               let updateVoucherUsed = {
                 ...useVoucher,

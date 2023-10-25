@@ -98,14 +98,12 @@ export class AppointmentSocketGateWay implements OnModuleInit {
                 // tinh tien khi co voucher vs type cash
                 if (body.voucher.discountType == "cash") {
                     totalNotVoucherBefore = totalNotVoucherAfter - (Number(body?.voucher?.value))
-                    console.log("totalNotVoucherBefore", totalNotVoucherBefore);
                     // tinh tien khi co voucher vs type cash & total < value discount
                     if (totalNotVoucherBefore < 0) {
                         totalNotVoucherBefore = 0
                     }
                     // tinh tien khi co voucher vs type percent
                 } else if (body.voucher.discountType == "percent") {
-                    console.log("percent", body.voucher.discountType);
                     totalNotVoucherBefore = totalNotVoucherAfter - (totalNotVoucherAfter * (Number(body?.voucher?.value)) * 0.01)
                 }
             }
@@ -124,7 +122,6 @@ export class AppointmentSocketGateWay implements OnModuleInit {
             let voucherHistoryData: any;
 
             if (body?.voucher) {
-                console.log("voucher", body?.voucher);
                 voucherHistoryData = {
                     voucherId: body?.voucher?.id
                 }

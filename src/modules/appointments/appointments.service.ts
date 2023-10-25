@@ -52,7 +52,6 @@ export class AppointmentsService {
 
     })
     const resResult = await this.appointmentRepository.save(resUpdate)
-    console.log("🚀 ~ file: appointments.service.ts:47 ~ AppointmentsService ~ update ~ resResult:aa", )
     var data = {
       customerName:resResult.customer.fullName,
       date:resResult.date,
@@ -72,9 +71,8 @@ export class AppointmentsService {
     // Tạo tệp PDF từ HTML đã được tạo ra 
     await pdf.create(html, options).toFile('./businesscard.pdf', function(err, res) {
       if (err) return console.log(err);
-      console.log(res); // { filename: './businesscard.pdf' }
     });
-    console.log("🚀 ~ file: appointments.service.ts:69 ~ AppointmentsService ~ pdf.create ~ pdf:", pdf)
+
     // resResult là dữ liệu đầu vào sao khi bấm thay đổi data base thành recipt
     // sau dó lam handle gửi mail kèm pdf
      this.mail.sendMail({

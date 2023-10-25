@@ -46,11 +46,9 @@ export class StaffServicesController {
   async remove(@Param('id') id: number, @Res() res: Response) {
     try {
       let StaffServiceRes = await this.staffServicesService.remove(id)
-      // console.log("StaffServiceRes:", StaffServiceRes)
       res.statusMessage = StaffServiceRes.message
       res.status(StaffServiceRes.data ? HttpStatus.OK : HttpStatus.ACCEPTED).json(StaffServiceRes)
     } catch (err) {
-      //console.log(" err: controller", err)
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
 
     }

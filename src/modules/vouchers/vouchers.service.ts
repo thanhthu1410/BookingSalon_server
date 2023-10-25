@@ -21,7 +21,6 @@ function formatTimestampToDate(timestamp) {
 export class VouchersService {
   constructor(@InjectRepository(Voucher) private voucherSer: Repository<Voucher>) { }
   async create(data: CreateVoucherDto) {
-    console.log("data", data);
     try {
       let result = await this.voucherSer.save(data)
       return {
@@ -49,7 +48,11 @@ export class VouchersService {
         take: pagination.take
       })
 
-      let countItem = (await this.voucherSer.find()).length
+      let countItem = (await this.voucherSer.find({
+        where:{
+          IsDelete: false
+        }
+      })).length
       let maxPage = Math.ceil(countItem / pagination.take)
       return {
         message: 'get voucher pagination successful',
@@ -116,10 +119,8 @@ export class VouchersService {
       if (result) {
         // check xem trang thai voucher da su dung hay chua
         if (!result.status) {
-          console.log("date.now", Date.now());
           // check xem voucher con trong thoi han hay khong
           if ((Date.now() - Number(result.startAt)) < 0 || (Date.now() - Number(result.endAt)) > 0) {
-            console.log("starttiem", formatTimestampToDate(Number(result.startAt)));
             return {
               status: false,
               data: null,
@@ -187,9 +188,6 @@ export class VouchersService {
           id
         }
       })
-      console.log("oldData", oldData);
-      console.log("updateVoucherDto", updateVoucherDto);
-
       const resutl = this.voucherSer.merge(oldData, updateVoucherDto)
       const updateData = await this.voucherSer.save(resutl)
       if (!resutl) return false
