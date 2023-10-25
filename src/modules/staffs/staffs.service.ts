@@ -120,7 +120,11 @@ export class StaffsService {
           name: ILike(`%${name}%`),
         },
         relations: {
-          staffServices: true,
+          staffServices: {
+            staff: true,
+            service: true
+          }
+
           //appointmentDetails: true
         }
       }
