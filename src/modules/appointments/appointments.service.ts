@@ -28,11 +28,17 @@ export class AppointmentsService {
 
       }
     })
-    return res;
+    if (!res) return {
+      status: false,
+      message: "get fail ",
+      data: null
+    }
+    return {
+      status: true,
+      message: "accept successfull ! ",
+      data: res
+    }
   }
-
-
-
 
   async acceptAppointment(id: number) {
     const res = await this.appointmentRepository.findOne({
@@ -54,7 +60,19 @@ export class AppointmentsService {
 
     })
     const resResult = await this.appointmentRepository.save(resUpdate)
-    return resResult ? await ejs.renderFile("emailActived.ejs") : "Xác thực thất bại, vui lòng thử lại!";
+    console.log("resResult", resResult);
+
+    if (!resResult) return {
+      status: false,
+      message: "Failed to accept",
+      data: null
+    }
+    return {
+      status: true,
+      message: "accept successfull ! ",
+      data: resResult
+    }
+
   }
 
   async update(id: number) {
