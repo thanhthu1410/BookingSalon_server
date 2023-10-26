@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as ejs from 'ejs';
 import * as pdf from 'html-pdf';
 import { MailService } from '../mail/mail.service';
+import { createPDF } from '../createPdf/method';
 
 @Injectable()
 export class AppointmentsService {
@@ -139,7 +140,7 @@ export class AppointmentsService {
     return `This action removes a #${id} appointment`;
   }
 
-  async updateInformation(id: number, updateAppointmentDto: UpdateAppointmentDto) {
+ /*  async updateInformation(id: number, updateAppointmentDto: UpdateAppointmentDto) {
     console.log("da vao appoint service")
     try {
       const appointment = await this.appointmentRepository.findOne({
@@ -171,7 +172,8 @@ export class AppointmentsService {
           apmTotal: result.total,
         };
         // Đọc tệp EJS
-        var ejsTemplate = fs.readFileSync('./pdf.ejs', 'utf8');
+        if(data){
+          var ejsTemplate = fs.readFileSync('./pdf.ejs', 'utf8');
 
         // Render tệp EJS với dữ liệu
         var html = ejs.render(ejsTemplate, data);
@@ -198,6 +200,7 @@ export class AppointmentsService {
             }
           ]
         });
+        } 
       }
 
       return {
@@ -210,5 +213,69 @@ export class AppointmentsService {
         data: null
       }
     }
+  } */
+  
+  async updateInformation(id: number, updateAppointmentDto: UpdateAppointmentDto) {
+    console.log("da vao appoint service");
+    try {
+      const appointment = await this.appointmentRepository.findOne({
+        where: {
+          id
+        },
+        relations: {
+          appointmentDetails: {
+            service: true,
+            staff: true
+          },
+          customer: true,
+          voucher: true
+        }
+      });
+      console.log("appointment", appointment);
+      console.log("updateAppointmentDto", updateAppointmentDto);
+      const updatedAppointment = this.appointmentRepository.merge(appointment, updateAppointmentDto);
+      const result = await this.appointmentRepository.save(updatedAppointment);
+  
+      if (result && result.status === "DONE") {
+        var data = {
+          customerName: result.customer.fullName,
+          date: result.date,
+          time: result.time,
+          appointmentDetail: result.appointmentDetails,
+          total: result.appointmentDetails.reduce((acc, detail) => acc + detail.price, 0),
+          voucherValue: (result.voucher) ? ((result.voucher.discountType === "percent") ? (result.voucher.value + "%") : ("$" + result.voucher.value)) : 0,
+          apmTotal: result.total,
+        };
+  
+        // Tạo tệp PDF trước
+        await createPDF(data);
+  
+        // Gửi email kèm tệp PDF
+        this.mail.sendMail({
+          to: result.customer.email,
+          subject: "Your Receipt - Rasm Salon",
+          html: `Thanks For Your Appointment.`,
+          attachments: [
+            {
+              filename: 'yourReceipt.pdf',
+              contentType: 'application/pdf',
+              path: "./yourReceipt.pdf"
+            }
+          ]
+        });
+      }
+  
+      return {
+        status: true,
+        data: result
+      }
+    } catch (error) {
+      console.error(error);
+      return {
+        status: false,
+        data: null
+      }
+    }
   }
+  
 }
