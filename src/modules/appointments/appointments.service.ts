@@ -152,55 +152,54 @@ export class AppointmentsService {
             staff: true
           },
           customer: true,
-          voucher:true
+          voucher: true
         }
       });
       console.log("appointment", appointment);
       console.log("updateAppointmentDto", updateAppointmentDto);
       const updatedAppointment = this.appointmentRepository.merge(appointment, updateAppointmentDto);
       const result = await this.appointmentRepository.save(updatedAppointment);
-      console.log("🚀 ~ file: appointments.service.ts:160 ~ AppointmentsService ~ updateInformation ~ result:", result)
+      if (result && result.status == "DONE") {
+        //gui email
+        var data = {
+          customerName: result.customer.fullName,
+          date: result.date,
+          time: result.time,
+          appointmentDetail: result.appointmentDetails,
+          total: result.appointmentDetails.reduce((acc, detail) => acc + detail.price, 0),
+          voucherValue: (result.voucher) ? ((result.voucher.discountType == "percent") ? (result.voucher.value + "%") : ("$" + result.voucher.value)) : 0,
+          apmTotal: result.total,
+        };
+        // Đọc tệp EJS
+        var ejsTemplate = fs.readFileSync('./pdf.ejs', 'utf8');
 
-      //gui email
-      var data = {
-      customerName: result.customer.fullName,
-      date: result.date,
-      time: result.time,
-      appointmentDetail: result.appointmentDetails,
-      total: result.appointmentDetails.reduce((acc, detail) => acc + detail.price, 0),
-      voucherValue: (result.voucher) ? ((result.voucher.discountType == "percent") ? (result.voucher.value + "%") : ("$" + result.voucher.value)) : 0,
-      apmTotal: result.total,
-    };
+        // Render tệp EJS với dữ liệu
+        var html = ejs.render(ejsTemplate, data);
 
-    // Đọc tệp EJS
-    var ejsTemplate = fs.readFileSync('./pdf.ejs', 'utf8');
+        var options = { format: 'Letter' };
 
-    // Render tệp EJS với dữ liệu
-    var html = ejs.render(ejsTemplate, data);
+        // Tạo tệp PDF từ HTML đã được tạo ra 
+        await pdf.create(html, options).toFile('./yourReceipt.pdf', function (err, res) {
+          if (err) return console.log(err);
+          console.log(res); // { filename: './yourReceipt.pdf' }
+        });
+        console.log("🚀 ~ file: appointments.service.ts:188 ~ AppointmentsService ~ pdf:", pdf)
+        // resResult là dữ liệu đầu vào sao khi bấm thay đổi data base thành recipt
+        // sau dó lam handle gửi mail kèm pdf
+        this.mail.sendMail({
+          to: result.customer.email,
+          subject: "aaa",
+          html: `Thanks For Your Appointment.`,
+          attachments: [
+            {
+              filename: 'yourReceipt.pdf',
+              contentType: 'application/pdf',
+              path: "./yourReceipt.pdf"
+            }
+          ]
+        });
+      }
 
-    var options = { format: 'Letter' };
-
-    // Tạo tệp PDF từ HTML đã được tạo ra 
-    await pdf.create(html, options).toFile('./yourReceipt.pdf', function (err, res) {
-      if (err) return console.log(err);
-      console.log(res); // { filename: './yourReceipt.pdf' }
-    });
-    console.log("🚀 ~ file: appointments.service.ts:188 ~ AppointmentsService ~ pdf:", pdf)
-    // resResult là dữ liệu đầu vào sao khi bấm thay đổi data base thành recipt
-    // sau dó lam handle gửi mail kèm pdf
-    this.mail.sendMail({
-      to: result.customer.email,
-      subject: "aaa",
-      html: `
-      Testing Pdf Generate document, Thanks.`,
-      attachments: [
-        {
-          filename: 'yourReceipt.pdf',
-          contentType: 'application/pdf',
-          path: "./yourReceipt.pdf"
-        }
-      ]
-    });
       return {
         status: true,
         data: result
