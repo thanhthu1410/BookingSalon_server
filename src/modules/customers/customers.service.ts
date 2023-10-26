@@ -239,11 +239,7 @@ export class CustomersService {
         },
         relations: {
           appointments: {
-            appointmentDetails: {
-              service: true,
-              staff: true,
-            },
-            voucher: true
+            appointmentDetails: true
           }
         },
       }
