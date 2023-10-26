@@ -234,7 +234,10 @@ export class CustomersService {
         },
         relations: {
           appointments: {
-            appointmentDetails: true
+            appointmentDetails: {
+              service: true,
+              staff: true
+            }
           }
         },
       }
