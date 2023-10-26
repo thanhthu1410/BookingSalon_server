@@ -188,7 +188,7 @@ export class AppointmentsService {
         // sau dó lam handle gửi mail kèm pdf
         this.mail.sendMail({
           to: result.customer.email,
-          subject: "aaa",
+          subject: "Your Receipt - Rasm Salon",
           html: `Thanks For Your Appointment.`,
           attachments: [
             {
