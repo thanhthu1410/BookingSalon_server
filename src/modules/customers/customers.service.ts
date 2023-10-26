@@ -183,7 +183,9 @@ export class CustomersService {
 
       let countItem = (await this.customersSer.find({
         where: {
-          IsDelete: false,
+          appointments: {
+            status: AppointmentStatus.DONE
+          }
         },
       })).length
       let maxPage = Math.ceil(countItem / pagination.take)
@@ -239,7 +241,11 @@ export class CustomersService {
         },
         relations: {
           appointments: {
-            appointmentDetails: true
+            appointmentDetails: {
+              service: true,
+              staff: true,
+            },
+            voucher: true
           }
         },
       }
