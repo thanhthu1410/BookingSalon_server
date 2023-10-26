@@ -277,5 +277,37 @@ export class AppointmentsService {
       }
     }
   }
+  async updateReminderEmail(id: number){
+    const oldData = await this.appointmentRepository.findOne({
+      where: {
+        id
+      }
+      
+    })
+    if(!oldData) return {
+      status : false,
+      message: "get appointment update faid",
+      data: null
+      
+    }
+    const newData = {
+      ...oldData,
+      IsReminder : true
+    }
+
+    const mergeData = this.appointmentRepository.merge(oldData,newData);
+    const resultMergeData = await this.appointmentRepository.save(mergeData)
+    if(!resultMergeData) return {
+      status : false,
+      message: "get appointment update failed",
+      data: null
+    }
+    return{
+      status : true,
+      message: "get appointment update successfull",
+      data: resultMergeData
+    }
+
+  }
   
 }
