@@ -172,8 +172,9 @@ export class CustomersService {
           appointments: {
             appointmentDetails: {
               service: true,
-              staff: true
-            }
+              staff: true,
+            },
+            voucher: true
           }
         },
         skip: pagination.skip,
@@ -207,7 +208,11 @@ export class CustomersService {
         },
         relations: {
           appointments: {
-            appointmentDetails: true
+            appointmentDetails: {
+              service: true,
+              staff: true,
+            },
+            voucher: true
           }
         },
 
@@ -234,10 +239,7 @@ export class CustomersService {
         },
         relations: {
           appointments: {
-            appointmentDetails: {
-              service: true,
-              staff: true
-            }
+            appointmentDetails: true
           }
         },
       }
