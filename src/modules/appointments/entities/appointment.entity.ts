@@ -25,6 +25,9 @@ export class Appointment {
     @Column({default: false})
     IsDelete: boolean
 
+    @Column({default:false})
+    IsReminder:boolean
+
     @Column({default: "busy"})
     reasonDelete: string
 
