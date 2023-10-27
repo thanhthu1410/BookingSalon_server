@@ -1,4 +1,4 @@
-import { Body, OnModuleInit, Res } from "@nestjs/common";
+import { Body, OnModuleInit } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
@@ -7,12 +7,10 @@ import { Appointment } from "src/modules/appointments/entities/appointment.entit
 import { AppointmentDetail } from "src/modules/appointment-details/entities/appointment-detail.entity";
 import { AppointmentService } from "./appointment.service";
 import { Repository } from "typeorm";
-import { Response } from "express";
 import * as fs from 'fs';
 import * as ejs from 'ejs';
 import { MailService } from "src/modules/mail/mail.service";
-import { AppointmentStatus } from "src/modules/appointments/appointment.enum";
-
+import { saveNotificationToFile } from "src/modules/methods/method";
 
 interface ClientType {
     socket: Socket,
@@ -58,12 +56,39 @@ export class AppointmentSocketGateWay implements OnModuleInit {
                 socket.emit("listAppointments", listAppointments)
             }
 
+            fs.readFile('notification.json', 'utf8', (err, data) => {
+                if (err) {
+                    console.error('Error reading file:', err);
+                    return;
+                }
+
+                if (data) {
+                    try {
+                        let notifications = JSON.parse(data);
+                        socket.emit("notifications", notifications);
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                    }
+                }
+            });
+
+
             socket.on("booking", async (body) => {
                 try {
                     let listAppointments = await this.handleBooking(body);
                     if (listAppointments) {
                         for (let i in this.clients) {
                             this.clients[i].socket.emit("listAppointments", listAppointments.data);
+                            saveNotificationToFile({
+                                message: `${listAppointments.newAppointment.customer.fullName} just made an appointment`
+                            })
+                                .then((notifications) => {
+                                    this.clients[i].socket.emit("notifications", notifications)
+                                    console.log('List of notifications:', notifications);
+                                })
+                                .catch((error) => {
+                                    console.error('Error:', error);
+                                });
                         }
                         socket.emit("listAppointments", listAppointments.data);
                     } else {
@@ -81,6 +106,19 @@ export class AppointmentSocketGateWay implements OnModuleInit {
                     this.clients[i].socket.emit("listAppointments", body);
                 }
                 socket.emit("listAppointments", body);
+            })
+
+            socket.on("acceptNotifications", async (data) => {
+                for (let i in this.clients) {
+                    saveNotificationToFile(data)
+                        .then((notifications) => {
+                            this.clients[i].socket.emit("notifications", notifications)
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+                }
+                socket.emit("notifications", data);
             })
         }))
     }
@@ -143,6 +181,7 @@ export class AppointmentSocketGateWay implements OnModuleInit {
             }
 
             let result = await this.appointmentService.create(customerData, appointmentData, formatAppointmentDetail, voucherHistoryData, body?.voucher);
+            console.log("result", result)
             // send email để người dùng xác nhận đặt lịch 
             // Mục đích: người dùng có thể xác nhận lịch hẹn của mình thông qua email
             //Bước cuối -1: Người dùng bấm xác nhận email thành công
@@ -177,7 +216,8 @@ export class AppointmentSocketGateWay implements OnModuleInit {
 
                 return {
                     status: true,
-                    data: listAppointments
+                    data: listAppointments,
+                    newAppointment: result
                 }
             } else {
                 return {
