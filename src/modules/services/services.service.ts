@@ -9,50 +9,45 @@ import { StaffService } from '../staff-services/entities/staff-service.entity';
 
 @Injectable()
 export class ServicesService {
-
   constructor(
     @InjectRepository(Service) private serviceRepository: Repository<Service>,
-    @InjectRepository(StaffService) private StaffServiceRepository: Repository<StaffService>
-  ) { }
-
-
+    @InjectRepository(StaffService)
+    private StaffServiceRepository: Repository<StaffService>,
+  ) {}
 
   async remove(id: number) {
     try {
-      let serviceData = await this.serviceRepository.findOne({ where: { id } })
+      let serviceData = await this.serviceRepository.findOne({ where: { id } });
 
       let newData = {
         ...serviceData,
-        isDelete: true
-      }
-      const result = this.serviceRepository.merge(serviceData, newData)
+        isDelete: true,
+      };
+      const result = this.serviceRepository.merge(serviceData, newData);
 
-      const updateResult = await this.serviceRepository.save(result)
+      const updateResult = await this.serviceRepository.save(result);
 
       if (updateResult) {
         return {
           status: true,
           data: updateResult,
-          message: "Delete ok"
-        }
+          message: 'Delete ok',
+        };
       }
-
     } catch (err) {
       return {
         status: false,
-        message: "Delete Faild ",
-        data: null
-      }
+        message: 'Delete Faild ',
+        data: null,
+      };
     }
   }
 
-
-
   async create(createServiceDto: CreateServiceDto) {
     try {
-      let service = await this.serviceRepository.save(createServiceDto)
+      let service = await this.serviceRepository.save(createServiceDto);
       if (!service) {
-        throw new Error('Error')
+        throw new Error('Error');
       }
 
       if (!service) {
@@ -60,11 +55,11 @@ export class ServicesService {
       }
       return {
         message: 'Servicio Creado',
-        data: service
-      }
+        data: service,
+      };
     } catch (err) {
-      console.log("err", err);
-      throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
+      console.log('err', err);
+      throw new HttpException('loi model', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -77,27 +72,29 @@ export class ServicesService {
         relations: {
           staffServices: {
             service: true,
-            staff: true
+            staff: true,
           },
-          appointmentDetails: true
+          appointmentDetails: true,
         },
         skip: pagination.skip,
         take: pagination.take,
-      })
+      });
 
-      let countItem = (await this.serviceRepository.find({
-        where: {
-          isDelete: false,
-        },
-      })).length
-      let maxPage = Math.ceil(countItem / pagination.take)
+      let countItem = (
+        await this.serviceRepository.find({
+          where: {
+            isDelete: false,
+          },
+        })
+      ).length;
+      let maxPage = Math.ceil(countItem / pagination.take);
       return {
         message: 'successful',
         data: services,
-        maxPage
-      }
+        maxPage,
+      };
     } catch (err) {
-      throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
+      throw new HttpException('loi model', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -105,55 +102,54 @@ export class ServicesService {
     try {
       let services = await this.serviceRepository.find({
         where: {
-          isDelete: false
+          isDelete: false,
+          status: true,
         },
         relations: {
           staffServices: {
-            staff: true
+            staff: true,
           },
-          appointmentDetails: true
-        }
-
-      })
+          appointmentDetails: true,
+        },
+      });
       return {
         message: 'successful',
         data: services,
-      }
+      };
     } catch (err) {
-      throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
+      throw new HttpException('loi model', HttpStatus.BAD_REQUEST);
     }
   }
 
   async update(id: number, updateServiceDto: UpdateServiceDto) {
     try {
-      let data = await this.serviceRepository.findOne({ where: { id } })
-      console.log("dataupdate", data);
+      let data = await this.serviceRepository.findOne({ where: { id } });
+      console.log('dataupdate', data);
 
-      if (!data) return false
+      if (!data) return false;
       // console.log("updatedata", updateServiceDto);
 
-      let newData = this.serviceRepository.merge(data, updateServiceDto)
-      let result = await this.serviceRepository.save(newData)
-      console.log("result", result);
+      let newData = this.serviceRepository.merge(data, updateServiceDto);
+      let result = await this.serviceRepository.save(newData);
+      console.log('result', result);
 
       return {
         status: true,
-        message: "Update service Successfully!",
-        data: result
-      }
+        message: 'Update service Successfully!',
+        data: result,
+      };
     } catch (err) {
       return {
         status: false,
-        message: "Update Faild ",
-        data: null
-      }
+        message: 'Update Faild ',
+        data: null,
+      };
     }
   }
 
   findOne(id: number) {
     return `This action returns a #${id} service`;
   }
-
 
   async searchByName(name: string) {
     try {
@@ -165,17 +161,15 @@ export class ServicesService {
         relations: {
           staffServices: true,
           //appointmentDetails: true
-        }
-      }
-      );
+        },
+      });
       return {
         data: service,
-        message: "Get service successfully"
-      }
+        message: 'Get service successfully',
+      };
     } catch (err) {
-      console.log("err111111:", err)
+      console.log('err111111:', err);
       throw new HttpException('Loi Model', HttpStatus.BAD_REQUEST);
     }
   }
 }
-
