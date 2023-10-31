@@ -48,7 +48,6 @@ export class VouchersController {
 
   @Get("search")
   async finMany(@Res() res: Response, @Query("search") search: string) {
-    console.log("search", search);
 
     if (search != undefined) {
       try {

@@ -31,7 +31,7 @@ export class AppointmentSocketGateWay implements OnModuleInit {
         @InjectRepository(AppointmentDetail) private readonly appointmentDetail: Repository<AppointmentDetail>,
         private readonly mail: MailService,
     ) { }
-
+        
     onModuleInit() {
         this.server.on("connect", (async (socket: Socket) => {
             console.log("Da co user connect")

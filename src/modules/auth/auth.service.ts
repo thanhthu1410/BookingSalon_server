@@ -44,6 +44,22 @@ export class AuthService {
     )
     return {accessToken, refreshToken}
    }
+   async refreshToken(refreshToken: string): Promise<any> {
+    try {
+        const verify = await this.jwtService.verifyAsync(refreshToken, {
+            secret: this.configService.get<string>('SECRET')
+        })
+        const checkExistToken = await this.userRepository.findOneBy({ userName:verify.userName, refreshToken })
+        if (checkExistToken) {
+            return this.generateToken({ id: verify.id, userName:verify.userName })
+        } else {
+            throw new HttpException('Refresh token is not valid', HttpStatus.BAD_REQUEST);
+        }
+
+    } catch (error) {
+        throw new HttpException('Refresh token is not valid', HttpStatus.BAD_REQUEST)
+    }
+}
   create(createAuthDto: CreateAuthDto) {
     return 'This action adds a new auth';
   }
