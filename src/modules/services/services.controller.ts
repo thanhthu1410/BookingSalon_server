@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, UploadedFile, UseInterceptors, HttpStatus, HttpException, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, UploadedFile, UseInterceptors, HttpStatus, HttpException, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
@@ -7,11 +7,12 @@ import { uploadFileToStorage } from 'src/firebase';
 import { Response, query } from 'express';
 
 import { PaginationDto } from './dto/pagination-service.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('services')
 export class ServicesController {
   constructor(private readonly servicesService: ServicesService) { }
-
+  @UseGuards(AuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('avatar'))
   async create(@Res() res: Response, @Body() body: any, @UploadedFile() file: Express.Multer.File, @Req() req: Request) {
@@ -45,6 +46,7 @@ export class ServicesController {
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
     }
   }
+
   @Get('search')
   async findAllService(@Res() res: Response, @Query('q') q: string) {
 
@@ -66,7 +68,7 @@ export class ServicesController {
     }
 
   }
-
+  @UseGuards(AuthGuard)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('avatar'))
   async update(@Res() res: Response, @Req() req: Request, @Param('id') id: number, @Body() body: any, updateServiceDto: UpdateServiceDto, @UploadedFile() file: Express.Multer.File) {
@@ -115,7 +117,7 @@ export class ServicesController {
   }
 
 
-
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: number, @Res() res: Response) {
     try {
