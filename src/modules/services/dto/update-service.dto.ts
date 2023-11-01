@@ -1,21 +1,26 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateServiceDto } from './create-service.dto';
 import { Allow } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateServiceDto extends PartialType(CreateServiceDto) {
-    @Allow()
-    price: number
+  @ApiProperty()
+  @Allow()
+  price: number;
 
-    @Allow()
-    name: string
+  @ApiProperty()
+  @Allow()
+  name: string;
 
-    @Allow()
-    desc: string
+  @ApiProperty()
+  @Allow()
+  desc: string;
 
-    @Allow()
-    avatar: string
+  @ApiProperty()
+  @Allow()
+  avatar: string;
 
-    @Allow()
-    status: boolean
-
+  @ApiProperty()
+  @Allow()
+  status: boolean;
 }

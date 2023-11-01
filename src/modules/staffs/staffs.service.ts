@@ -14,6 +14,7 @@ export class StaffsService {
     @InjectRepository(StaffService)
     private StaffServiceRepository: Repository<StaffService>,
   ) {}
+
   async create(createStaffDto: CreateStaffDto, serviceList: Array<number>) {
     try {
       const newstaff = await this.StaffRepository.save(createStaffDto);
@@ -134,10 +135,6 @@ export class StaffsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} staff`;
-  }
-
   async update(id: number, updateStaffDto: UpdateStaffDto) {
     try {
       const data = await this.StaffRepository.findOne({
@@ -178,13 +175,8 @@ export class StaffsService {
         ...oldStaff,
         IsDelete: true,
       };
-      //  console.log("newstaff:", newstaff)
       const result = this.StaffRepository.merge(oldStaff, newstaff);
-      //console.log("result:", result)
-
       const updateResult = await this.StaffRepository.save(result);
-      // console.log("updateStaff", updateResult);
-
       if (updateResult) {
         return {
           status: true,

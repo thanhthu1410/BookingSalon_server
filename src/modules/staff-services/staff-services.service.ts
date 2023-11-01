@@ -5,36 +5,31 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { StaffService } from './entities/staff-service.entity';
 import { Repository } from 'typeorm';
 
-
 @Injectable()
-
 export class StaffServicesService {
-
   constructor(
     @InjectRepository(StaffService)
     private StaffServiceRepository: Repository<StaffService>,
-  ) { }
+  ) {}
 
   async create(createStaffServiceDto: CreateStaffServiceDto) {
     try {
-      let service = await this.StaffServiceRepository.save(createStaffServiceDto)
+      let service = await this.StaffServiceRepository.save(
+        createStaffServiceDto,
+      );
       return {
         status: true,
         message: 'Servicio Creado',
-        data: service
-      }
+        data: service,
+      };
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
       return {
         status: false,
         message: 'Create fail',
-        data: null
-      }
+        data: null,
+      };
     }
-  }
-
-  findAll() {
-    return `This action returns all staffServices`;
   }
 
   async findOne(id: number) {
@@ -43,45 +38,39 @@ export class StaffServicesService {
         where: { id },
         relations: {
           staff: true,
-          service: true
-        }
-      })
+          service: true,
+        },
+      });
       return {
         status: true,
-        message: "find categoryId success",
-        data: staffServiceId
-      }
+        message: 'find categoryId success',
+        data: staffServiceId,
+      };
     } catch (err) {
       return {
         status: false,
-        message: "find categoryId success",
-        data: null
-      }
+        message: 'find categoryId success',
+        data: null,
+      };
     }
-  }
-
-  update(id: number, updateStaffServiceDto: UpdateStaffServiceDto) {
-    return `This action updates a #${id} staffService`;
   }
 
   async remove(id: number) {
     try {
-      let staffServiceId = await this.StaffServiceRepository.delete(id)
+      let staffServiceId = await this.StaffServiceRepository.delete(id);
       //console.log("staffServiceId:", staffServiceId)
       return {
         status: true,
-        message: "delete success",
-        data: staffServiceId
-      }
+        message: 'delete success',
+        data: staffServiceId,
+      };
     } catch (err) {
       //console.log(" err:", err)
       return {
         status: true,
-        message: "delete success",
-        data: null
-      }
+        message: 'delete success',
+        data: null,
+      };
     }
   }
-
-
 }
