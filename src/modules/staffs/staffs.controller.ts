@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res, HttpException, HttpStatus, Req, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Res, HttpException, HttpStatus, Req, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { StaffsService } from './staffs.service';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
@@ -6,13 +6,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { uploadFileToStorage } from 'src/firebase';
 import { PaginationDto } from './dto/pagination-staff.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 
 @Controller('staffs')
 export class StaffsController {
 
   constructor(private readonly staffsService: StaffsService) { }
-
+  @UseGuards(AuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('avatar'))
   async create(@Res() res: Response, @Body() body: any, @UploadedFile() file: Express.Multer.File, @Req() req: Request) {
@@ -79,7 +80,7 @@ export class StaffsController {
   findOne(@Param('id') id: string) {
     return this.staffsService.findOne(+id);
   }
-
+  @UseGuards(AuthGuard)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('avatar'))
   async update(@Res() res: Response, @Param('id') id: number, @Body() body: any, updateStaffDto: UpdateStaffDto, @UploadedFile() file: Express.Multer.File) {
@@ -111,7 +112,7 @@ export class StaffsController {
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
     }
   }
-
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: number, @Res() res: Response) {
     try {

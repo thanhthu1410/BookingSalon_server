@@ -1,13 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpException, HttpStatus, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpException, HttpStatus, Req, UseGuards } from '@nestjs/common';
 import { StaffServicesService } from './staff-services.service';
 import { CreateStaffServiceDto } from './dto/create-staff-service.dto';
 import { UpdateStaffServiceDto } from './dto/update-staff-service.dto';
 import { Response } from 'express'
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('staff-services')
 export class StaffServicesController {
   constructor(private readonly staffServicesService: StaffServicesService) { }
-
+  @UseGuards(AuthGuard)
   @Post()
   async create(@Res() res: Response, @Body() createStaffServiceDto: CreateStaffServiceDto) {
     try {
@@ -36,12 +37,12 @@ export class StaffServicesController {
     }
 
   }
-
+  @UseGuards(AuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateStaffServiceDto: UpdateStaffServiceDto) {
     return this.staffServicesService.update(+id, updateStaffServiceDto);
   }
-
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: number, @Res() res: Response) {
     try {
@@ -55,6 +56,4 @@ export class StaffServicesController {
 
     }
   }
-
-
 }

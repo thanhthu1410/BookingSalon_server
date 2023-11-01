@@ -1,14 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, ParseIntPipe, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, ParseIntPipe, HttpStatus, HttpException, UseGuards } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { Response } from "express"
 import { PaginationDto } from './dto/pagination-customer.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('customers')
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) { }
-
+  
   @Post()
   async create(@Body() body: any, createCustomerDto: CreateCustomerDto, @Res() res: Response) {
 
@@ -64,6 +65,7 @@ export class CustomersController {
     console.log("result", result);
     return res.status(result.status ? 200 : 213).json(result.message)
   }
+  @UseGuards(AuthGuard)
   @Get()
   async findAll(@Res() res: Response, @Query("skip", ParseIntPipe) skip: number, @Query("take", ParseIntPipe) take: number) {
     try {
@@ -78,7 +80,7 @@ export class CustomersController {
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST)
     }
   }
-
+  @UseGuards(AuthGuard)
   @Get('search')
   async findAllCustomer(@Res() res: Response, @Query('q') q: string) {
 
@@ -106,7 +108,7 @@ export class CustomersController {
   findOne(@Param('id') id: string) {
     return this.customersService.findOne(+id);
   }
-
+  @UseGuards(AuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCustomerDto: UpdateCustomerDto) {
     return this.customersService.update(+id, updateCustomerDto);

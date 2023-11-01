@@ -22,7 +22,11 @@ export class AuthController {
   create(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.create(createAuthDto);
   }
-
+  @Post('refresh-token')
+  refreshToken(@Body() {refresh_token}):Promise<any>{
+      console.log('refresh token api')
+      return this.authService.refreshToken(refresh_token);
+  }
   @Get()
   findAll() {
     return this.authService.findAll();
