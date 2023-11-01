@@ -19,6 +19,7 @@ export class AuthGuard implements CanActivate{
             const payload = await this.jwtService.verifyAsync(token, {
                 secret: this.configService.get<string>('SECRET')
             })
+            console.log("🚀 ~ file: auth.guard.ts:22 ~ AuthGuard ~ canActivate ~ payload:", payload)
             
             if(payload.role=="ADMIN"){ 
                 request['user_data'] = payload; 
@@ -26,7 +27,7 @@ export class AuthGuard implements CanActivate{
                 throw new HttpException(' User is not an ADMIN', HttpStatus.BAD_REQUEST);
             }
         }catch(err){
-            console.log("🚀 ~ file: auth.guard.ts:27 ~ AuthGuard ~ canActivate ~ err:", err)
+          
             throw new HttpException({
                 status: 419,
                 message: "Token expired"
