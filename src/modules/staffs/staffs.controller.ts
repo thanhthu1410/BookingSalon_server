@@ -24,7 +24,16 @@ import { Response } from 'express';
 import { uploadFileToStorage } from 'src/firebase';
 import { PaginationDto } from './dto/pagination-staff.dto';
 import { AuthGuard } from '../auth/auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+class ResInterface {
+  @ApiProperty()
+  message: string;
+  @ApiProperty()
+  data: any;
+  @ApiProperty()
+  status: boolean;
+}
 
 @ApiTags('staffs')
 @Controller('staffs')
@@ -32,6 +41,9 @@ export class StaffsController {
   constructor(private readonly staffsService: StaffsService) {}
   @UseGuards(AuthGuard)
   @Post()
+  @ApiResponse({
+    type: ResInterface,
+  })
   @UseInterceptors(FileInterceptor('avatar'))
   async create(
     @Res() res: Response,
@@ -63,6 +75,9 @@ export class StaffsController {
   }
 
   @Get()
+  @ApiResponse({
+    type: ResInterface,
+  })
   async findAll(
     @Res() res: Response,
     @Query('skip', ParseIntPipe) skip: number,
@@ -84,6 +99,9 @@ export class StaffsController {
   }
 
   @Get('search')
+  @ApiResponse({
+    type: ResInterface,
+  })
   async findAllService(@Res() res: Response, @Query('q') q: string) {
     if (q != undefined) {
       try {
@@ -106,12 +124,11 @@ export class StaffsController {
     }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.staffsService.findOne(+id);
-  }
   @UseGuards(AuthGuard)
   @Patch(':id')
+  @ApiResponse({
+    type: ResInterface,
+  })
   @UseInterceptors(FileInterceptor('avatar'))
   async update(
     @Res() res: Response,
@@ -154,6 +171,9 @@ export class StaffsController {
   }
   @UseGuards(AuthGuard)
   @Delete(':id')
+  @ApiResponse({
+    type: ResInterface,
+  })
   async remove(@Param('id') id: number, @Res() res: Response) {
     try {
       let staffRes = await this.staffsService.remove(id);
