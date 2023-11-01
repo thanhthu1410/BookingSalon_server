@@ -1,4 +1,3 @@
-
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -19,144 +18,161 @@ import { AppointmentStatus } from '../appointments/appointment.enum';
 export class CustomersService {
   constructor(
     @InjectRepository(Customer) private customersSer: Repository<Customer>,
-    @InjectRepository(Appointment) private appoimentSer: Repository<Appointment>,
-    @InjectRepository(AppointmentDetail) private appoimentDetailSer: Repository<AppointmentDetail>,
-    @InjectRepository(VoucherHistory) private voucherHistorySer: Repository<VoucherHistory>,
-    @InjectRepository(Voucher) private voucherSer: Repository<Voucher>
-  ) { }
-  async create(createCustomerDto: CreateCustomerDto, createAppointmentDto: any, createAppointmentDetailDto: CreateAppointmentDetailDto[], voucherHistoryDto?: CreateVoucherHistoryDto, useVoucher?: any) {
-
+    @InjectRepository(Appointment)
+    private appoimentSer: Repository<Appointment>,
+    @InjectRepository(AppointmentDetail)
+    private appoimentDetailSer: Repository<AppointmentDetail>,
+    @InjectRepository(VoucherHistory)
+    private voucherHistorySer: Repository<VoucherHistory>,
+    @InjectRepository(Voucher) private voucherSer: Repository<Voucher>,
+  ) {}
+  async create(
+    createCustomerDto: CreateCustomerDto,
+    createAppointmentDto: any,
+    createAppointmentDetailDto: CreateAppointmentDetailDto[],
+    voucherHistoryDto?: CreateVoucherHistoryDto,
+    useVoucher?: any,
+  ) {
     try {
       let customerRes;
       const findCustomer = await this.customersSer.findOne({
         where: {
-          email: createCustomerDto.email
-        }
-      })
+          email: createCustomerDto.email,
+        },
+      });
       if (!findCustomer) {
         customerRes = await this.customersSer.save(createCustomerDto);
-        console.log("customerRes", customerRes);
-        if (!customerRes) return {
-          status: false,
-          message: "Error al crear el cliente"
-        }
+        console.log('customerRes', customerRes);
+        if (!customerRes)
+          return {
+            status: false,
+            message: 'Error al crear el cliente',
+          };
         if (customerRes) {
           let formartAppointment = {
             ...createAppointmentDto,
-            customerId: customerRes.id
-          }
-          let appointmentRes = await this.appoimentSer.save(formartAppointment)
-          console.log("appointmentRes", appointmentRes);
-          if (!appointmentRes) throw new Error('Error al crear cita')
+            customerId: customerRes.id,
+          };
+          let appointmentRes = await this.appoimentSer.save(formartAppointment);
+          console.log('appointmentRes', appointmentRes);
+          if (!appointmentRes) throw new Error('Error al crear cita');
 
           if (appointmentRes) {
             // chekck xem co voucher hay khong !
             if (voucherHistoryDto) {
-              console.log("voucherHistoryDto", voucherHistoryDto);
+              console.log('voucherHistoryDto', voucherHistoryDto);
               const formartVoucherHistory = {
                 ...voucherHistoryDto,
                 appointmentId: Number(appointmentRes.id),
-                customerId: Number(customerRes.id)
-              }
-              let resultVoucherHistory = await this.voucherHistorySer.save(formartVoucherHistory)
-              console.log("resultVoucherHistory", resultVoucherHistory);
+                customerId: Number(customerRes.id),
+              };
+              let resultVoucherHistory = await this.voucherHistorySer.save(
+                formartVoucherHistory,
+              );
+              console.log('resultVoucherHistory', resultVoucherHistory);
               if (resultVoucherHistory) {
                 let updateVoucherUsed = {
                   ...useVoucher,
-                  status: true
-                }
-                let updatedVoucher = this.voucherSer.merge(useVoucher, updateVoucherUsed);
-                let resultUpdateVoucher = await this.voucherSer.save(updatedVoucher)
+                  status: true,
+                };
+                let updatedVoucher = this.voucherSer.merge(
+                  useVoucher,
+                  updateVoucherUsed,
+                );
+                let resultUpdateVoucher =
+                  await this.voucherSer.save(updatedVoucher);
               }
             }
             for (let i in createAppointmentDetailDto) {
               createAppointmentDetailDto[i] = {
                 ...createAppointmentDetailDto[i],
-                appointmentId: appointmentRes.id
-              }
+                appointmentId: appointmentRes.id,
+              };
             }
-            let resultAppomentDetailRes = await Promise.all(createAppointmentDetailDto.map(async (detail) => await this.appoimentDetailSer.save(detail)))
+            let resultAppomentDetailRes = await Promise.all(
+              createAppointmentDetailDto.map(
+                async (detail) => await this.appoimentDetailSer.save(detail),
+              ),
+            );
 
             return {
               status: true,
-              message: "create booking successfull ",
+              message: 'create booking successfull ',
               customer: customerRes,
               appoiment: appointmentRes,
-              details: resultAppomentDetailRes
-
-            }
+              details: resultAppomentDetailRes,
+            };
           }
-
         }
       } else {
         let formartAppointment = {
           ...createAppointmentDto,
-          customerId: findCustomer.id
-        }
-        let appointmentRes = await this.appoimentSer.save(formartAppointment)
-        console.log("appointmentRes", appointmentRes);
-        if (!appointmentRes) throw new Error('Error al crear cita')
+          customerId: findCustomer.id,
+        };
+        let appointmentRes = await this.appoimentSer.save(formartAppointment);
+        console.log('appointmentRes', appointmentRes);
+        if (!appointmentRes) throw new Error('Error al crear cita');
 
         if (appointmentRes) {
           // chekck xem co voucher hay khong !
           if (voucherHistoryDto) {
-            console.log("voucherHistoryDto", voucherHistoryDto);
+            console.log('voucherHistoryDto', voucherHistoryDto);
             const formartVoucherHistory = {
               ...voucherHistoryDto,
               appointmentId: Number(appointmentRes.id),
-              customerId: Number(findCustomer.id)
-            }
-            let resultVoucherHistory = await this.voucherHistorySer.save(formartVoucherHistory)
-            console.log("resultVoucherHistory", resultVoucherHistory);
+              customerId: Number(findCustomer.id),
+            };
+            let resultVoucherHistory = await this.voucherHistorySer.save(
+              formartVoucherHistory,
+            );
+            console.log('resultVoucherHistory', resultVoucherHistory);
             if (resultVoucherHistory) {
               let updateVoucherUsed = {
                 ...useVoucher,
-                status: true
-              }
-              let updatedVoucher = this.voucherSer.merge(useVoucher, updateVoucherUsed);
-              let resultUpdateVoucher = await this.voucherSer.save(updatedVoucher)
+                status: true,
+              };
+              let updatedVoucher = this.voucherSer.merge(
+                useVoucher,
+                updateVoucherUsed,
+              );
+              let resultUpdateVoucher =
+                await this.voucherSer.save(updatedVoucher);
             }
           }
           for (let i in createAppointmentDetailDto) {
             createAppointmentDetailDto[i] = {
               ...createAppointmentDetailDto[i],
-              appointmentId: appointmentRes.id
-            }
+              appointmentId: appointmentRes.id,
+            };
           }
-          let resultAppomentDetailRes = await Promise.all(createAppointmentDetailDto.map(async (detail) => await this.appoimentDetailSer.save(detail)))
+          let resultAppomentDetailRes = await Promise.all(
+            createAppointmentDetailDto.map(
+              async (detail) => await this.appoimentDetailSer.save(detail),
+            ),
+          );
 
           return {
             status: true,
-            message: "create booking successfull ",
+            message: 'create booking successfull ',
             customer: customerRes,
             appoiment: appointmentRes,
-            details: resultAppomentDetailRes
-
-          }
+            details: resultAppomentDetailRes,
+          };
         }
-
-
-
       }
-
-
 
       return {
         status: true,
-        message: "create booking okey",
-
-
-      }
-
+        message: 'create booking okey',
+      };
     } catch (err) {
-      console.log("err", err);
+      console.log('err', err);
 
       return {
         status: false,
-        message: "faild"
-      }
+        message: 'faild',
+      };
     }
-
   }
 
   async findAll(pagination: PaginationDto) {
@@ -165,8 +181,8 @@ export class CustomersService {
         where: {
           //IsDelete: false,
           appointments: {
-            status: AppointmentStatus.DONE
-          }
+            status: AppointmentStatus.DONE,
+          },
         },
         relations: {
           appointments: {
@@ -174,28 +190,31 @@ export class CustomersService {
               service: true,
               staff: true,
             },
-            voucher: true
-          }
+            voucher: true,
+          },
         },
         skip: pagination.skip,
         take: pagination.take,
-      })
+      });
 
-      let countItem = (await this.customersSer.find({
-        where: {
-          appointments: {
-            status: AppointmentStatus.DONE
-          }
-        },
-      })).length
-      let maxPage = Math.ceil(countItem / pagination.take)
+      let countItem = (
+        await this.customersSer.find({
+          where: {
+            appointments: {
+              status: AppointmentStatus.DONE,
+            },
+          },
+        })
+      ).length;
+      let maxPage = Math.ceil(countItem / pagination.take);
       return {
         message: 'successful',
         data: listCustomers,
-        maxPage
-      }
+        maxPage,
+      };
     } catch (err) {
-      throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
+      console.log('loi model findAll ~ err:', err);
+      throw new HttpException('loi model', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -205,8 +224,8 @@ export class CustomersService {
         where: {
           IsDelete: false,
           appointments: {
-            status: AppointmentStatus.DONE
-          }
+            status: AppointmentStatus.DONE,
+          },
         },
         relations: {
           appointments: {
@@ -214,20 +233,18 @@ export class CustomersService {
               service: true,
               staff: true,
             },
-            voucher: true
-          }
+            voucher: true,
+          },
         },
-
-      })
+      });
       return {
         message: 'successful',
         data: listCustomer,
-      }
+      };
     } catch (err) {
-      throw new HttpException('loi model', HttpStatus.BAD_REQUEST)
+      throw new HttpException('loi model', HttpStatus.BAD_REQUEST);
     }
   }
-
 
   async searchByEmail(email: string) {
     try {
@@ -236,8 +253,8 @@ export class CustomersService {
           IsDelete: false,
           email: ILike(`%${email}%`),
           appointments: {
-            status: AppointmentStatus.DONE
-          }
+            status: AppointmentStatus.DONE,
+          },
         },
         relations: {
           appointments: {
@@ -245,17 +262,16 @@ export class CustomersService {
               service: true,
               staff: true,
             },
-            voucher: true
-          }
+            voucher: true,
+          },
         },
-      }
-      );
+      });
       return {
         data: customer,
-        message: "Get service successfully"
-      }
+        message: 'Get service successfully',
+      };
     } catch (err) {
-      console.log("err111111:", err)
+      console.log('err111111:', err);
       throw new HttpException('Loi Model', HttpStatus.BAD_REQUEST);
     }
   }
