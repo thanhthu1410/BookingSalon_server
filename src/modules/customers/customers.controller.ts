@@ -84,6 +84,7 @@ export class CustomersController {
 
     if (q != undefined) {
       try {
+        console.log("q",q)
         return res.status(HttpStatus.OK).json(await this.customersService.searchByEmail(q))
       } catch (err) {
         throw new HttpException('Loi Controller', HttpStatus.BAD_REQUEST);
