@@ -31,7 +31,7 @@ export class AppointmentSocketGateWay implements OnModuleInit {
         @InjectRepository(AppointmentDetail) private readonly appointmentDetail: Repository<AppointmentDetail>,
         private readonly mail: MailService,
     ) { }
-        
+
     onModuleInit() {
         this.server.on("connect", (async (socket: Socket) => {
             console.log("Da co user connect")
@@ -80,7 +80,7 @@ export class AppointmentSocketGateWay implements OnModuleInit {
                         for (let i in this.clients) {
                             this.clients[i].socket.emit("listAppointments", listAppointments.data);
                             saveNotificationToFile({
-                                message: `${listAppointments.newAppointment.customer.fullName} just made an appointment`
+                                message: `${listAppointments.newAppointment.customer.fullName} just made an appointment at ${listAppointments.newAppointment.appoiment.date} ${listAppointments.newAppointment.appoiment.time}`
                             })
                                 .then((notifications) => {
                                     this.clients[i].socket.emit("notifications", notifications)

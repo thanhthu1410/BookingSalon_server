@@ -13,9 +13,13 @@ import { createPDF } from '../createPdf/method';
 
 @Injectable()
 export class AppointmentsService {
-  constructor(@InjectRepository(Appointment) private appointmentRepository: Repository<Appointment>, private readonly mail: MailService) { }
+  constructor(
+    @InjectRepository(Appointment)
+    private appointmentRepository: Repository<Appointment>,
+    private readonly mail: MailService,
+  ) {}
   create(createAppointmentDto: CreateAppointmentDto) {
-    return 'This action adds a new appointment'; 
+    return 'This action adds a new appointment';
   }
 
   async findAll() {
@@ -23,22 +27,22 @@ export class AppointmentsService {
       relations: {
         appointmentDetails: {
           staff: true,
-          service: true
+          service: true,
         },
         customer: true,
-
-      }
-    })
-    if (!res) return {
-      status: false,
-      message: "get fail ",
-      data: null
-    }
+      },
+    });
+    if (!res)
+      return {
+        status: false,
+        message: 'get fail ',
+        data: null,
+      };
     return {
       status: true,
-      message: "accept successfull ! ",
-      data: res
-    }
+      message: 'accept successfull ! ',
+      data: res,
+    };
   }
 
   async acceptAppointment(id: number) {
@@ -47,61 +51,58 @@ export class AppointmentsService {
       relations: {
         appointmentDetails: {
           staff: true,
-          service: true
+          service: true,
         },
         customer: true,
-
-      }
-    })
+      },
+    });
     if (res.status != AppointmentStatus.PENDING) {
-      return await ejs.renderFile("acceptedConfirm.ejs")
+      return await ejs.renderFile('acceptedConfirm.ejs');
     }
     const resUpdate = this.appointmentRepository.merge(res, {
-      status: AppointmentStatus.ACCEPTED
+      status: AppointmentStatus.ACCEPTED,
+    });
+    const resResult = await this.appointmentRepository.save(resUpdate);
+    console.log('resResult', resResult);
 
-    })
-    const resResult = await this.appointmentRepository.save(resUpdate)
-    console.log("resResult", resResult);
-
-    if (!resResult) return {
-      status: false,
-      message: "Failed to accept",
-      data: null
-    }
+    if (!resResult)
+      return {
+        status: false,
+        message: 'Failed to accept',
+        data: null,
+      };
     return {
       status: true,
-      message: "accept successfull ! ",
-      data: resResult
-    }
-
+      message: 'accept successfull ! ',
+      data: resResult,
+    };
   }
 
   async update(id: number) {
-
-
     const res = await this.appointmentRepository.findOne({
       where: { id: id },
       relations: {
         appointmentDetails: {
           staff: true,
-          service: true
+          service: true,
         },
         customer: true,
-
-      }
-    })
+      },
+    });
     const resUpdate = this.appointmentRepository.merge(res, {
-      status: AppointmentStatus.DONE
-
-    })
-    const resResult = await this.appointmentRepository.save(resUpdate)
+      status: AppointmentStatus.DONE,
+    });
+    const resResult = await this.appointmentRepository.save(resUpdate);
 
     var data = {
       customerName: resResult.customer.fullName,
       date: resResult.date,
       time: resResult.time,
       appointmentDetail: resResult.appointmentDetails,
-      total: resResult.appointmentDetails.reduce((acc, detail) => acc + detail.price, 0)
+      total: resResult.appointmentDetails.reduce(
+        (acc, detail) => acc + detail.price,
+        0,
+      ),
     };
 
     // Đọc tệp EJS
@@ -112,26 +113,28 @@ export class AppointmentsService {
 
     var options = { format: 'Letter' };
 
-    // Tạo tệp PDF từ HTML đã được tạo ra 
-    await pdf.create(html, options).toFile('./businesscard.pdf', function (err, res) {
-      if (err) return console.log(err);
-      console.log(res); // { filename: './businesscard.pdf' }
-    });
-    console.log("🚀 ~ file: appointments.service.ts:69 ~ AppointmentsService ~ pdf.create ~ pdf:", pdf)
+    // Tạo tệp PDF từ HTML đã được tạo ra
+    await pdf
+      .create(html, options)
+      .toFile('./businesscard.pdf', function (err, res) {
+        if (err) return console.log(err);
+        console.log(res); // { filename: './businesscard.pdf' }
+      });
+    // console.log("🚀 ~ file: appointments.service.ts:69 ~ AppointmentsService ~ pdf.create ~ pdf:", pdf)
     // resResult là dữ liệu đầu vào sao khi bấm thay đổi data base thành recipt
     // sau dó lam handle gửi mail kèm pdf
     this.mail.sendMail({
       to: resResult.customer.email,
-      subject: "aaa",
+      subject: 'aaa',
       html: `
       Testing Pdf Generate document, Thanks.`,
       attachments: [
         {
           filename: 'businesscard.pdf',
           contentType: 'application/pdf',
-          path: "./businesscard.pdf"
-        }
-      ]
+          path: './businesscard.pdf',
+        },
+      ],
     });
     return resResult;
   }
@@ -140,7 +143,7 @@ export class AppointmentsService {
     return `This action removes a #${id} appointment`;
   }
 
- /*  async updateInformation(id: number, updateAppointmentDto: UpdateAppointmentDto) {
+  /*  async updateInformation(id: number, updateAppointmentDto: UpdateAppointmentDto) {
     console.log("da vao appoint service")
     try {
       const appointment = await this.appointmentRepository.findOne({
@@ -214,100 +217,111 @@ export class AppointmentsService {
       }
     }
   } */
-  
-  async updateInformation(id: number, updateAppointmentDto: UpdateAppointmentDto) {
-    console.log("da vao appoint service");
+
+  async updateInformation(
+    id: number,
+    updateAppointmentDto: UpdateAppointmentDto,
+  ) {
+    console.log('da vao appoint service');
     try {
       const appointment = await this.appointmentRepository.findOne({
         where: {
-          id
+          id,
         },
         relations: {
           appointmentDetails: {
             service: true,
-            staff: true
+            staff: true,
           },
           customer: true,
-          voucher: true
-        }
+          voucher: true,
+        },
       });
-      console.log("appointment", appointment);
-      console.log("updateAppointmentDto", updateAppointmentDto);
-      const updatedAppointment = this.appointmentRepository.merge(appointment, updateAppointmentDto);
+      console.log('appointment', appointment);
+      console.log('updateAppointmentDto', updateAppointmentDto);
+      const updatedAppointment = this.appointmentRepository.merge(
+        appointment,
+        updateAppointmentDto,
+      );
       const result = await this.appointmentRepository.save(updatedAppointment);
-  
-      if (result && result.status === "DONE") {
+
+      if (result && result.status === 'DONE') {
         var data = {
           customerName: result.customer.fullName,
           date: result.date,
           time: result.time,
           appointmentDetail: result.appointmentDetails,
-          total: result.appointmentDetails.reduce((acc, detail) => acc + detail.price, 0),
-          voucherValue: (result.voucher) ? ((result.voucher.discountType === "percent") ? (result.voucher.value + "%") : ("$" + result.voucher.value)) : 0,
+          total: result.appointmentDetails.reduce(
+            (acc, detail) => acc + detail.price,
+            0,
+          ),
+          voucherValue: result.voucher
+            ? result.voucher.discountType === 'percent'
+              ? result.voucher.value + '%'
+              : '$' + result.voucher.value
+            : 0,
           apmTotal: result.total,
         };
-  
+
         // Tạo tệp PDF trước
         await createPDF(data);
-  
+
         // Gửi email kèm tệp PDF
         this.mail.sendMail({
           to: result.customer.email,
-          subject: "Your Receipt - Rasm Salon",
+          subject: 'Your Receipt - Rasm Salon',
           html: `Thanks For Your Appointment.`,
           attachments: [
             {
               filename: 'yourReceipt.pdf',
               contentType: 'application/pdf',
-              path: "./yourReceipt.pdf"
-            }
-          ]
+              path: './yourReceipt.pdf',
+            },
+          ],
         });
       }
-  
+
       return {
         status: true,
-        data: result
-      }
+        data: result,
+      };
     } catch (error) {
       console.error(error);
       return {
         status: false,
-        data: null
-      }
+        data: null,
+      };
     }
   }
-  async updateReminderEmail(id: number){
+  async updateReminderEmail(id: number) {
     const oldData = await this.appointmentRepository.findOne({
       where: {
-        id
-      }
-      
-    })
-    if(!oldData) return {
-      status : false,
-      message: "get appointment update faid",
-      data: null
-      
-    }
+        id,
+      },
+    });
+    if (!oldData)
+      return {
+        status: false,
+        message: 'get appointment update faid',
+        data: null,
+      };
     const newData = {
       ...oldData,
-      IsReminder : true
-    }
+      IsReminder: true,
+    };
 
-    const mergeData = this.appointmentRepository.merge(oldData,newData);
-    const resultMergeData = await this.appointmentRepository.save(mergeData)
-    if(!resultMergeData) return {
-      status : false,
-      message: "get appointment update failed",
-      data: null
-    }
-    return{
-      status : true,
-      message: "get appointment update successfull",
-      data: resultMergeData
-    }
-
+    const mergeData = this.appointmentRepository.merge(oldData, newData);
+    const resultMergeData = await this.appointmentRepository.save(mergeData);
+    if (!resultMergeData)
+      return {
+        status: false,
+        message: 'get appointment update failed',
+        data: null,
+      };
+    return {
+      status: true,
+      message: 'get appointment update successfull',
+      data: resultMergeData,
+    };
   }
-  
 }
