@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { Repository } from 'typeorm';
@@ -61,11 +61,17 @@ export class AuthService {
     }
 }
   create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+    
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async checkToken(userName: string) {
+    const user= await this.userRepository.findOne(
+      {
+        where:{ userName: userName}
+      }
+    )
+    console.log("🚀 ~ file: auth.service.ts:73 ~ AuthService ~ checkToken ~ user:", user)
+    return user;
   }
 
   findOne(id: number) {

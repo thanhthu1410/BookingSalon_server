@@ -42,11 +42,6 @@ export class StaffServicesController {
     }
   }
 
-  @Get()
-  findAll() {
-    return this.staffServicesService.findAll();
-  }
-
   @Get(':id')
   async findOne(@Param('id') id: number, @Res() res: Response) {
     try {
@@ -61,14 +56,7 @@ export class StaffServicesController {
       throw new HttpException('loi model', HttpStatus.BAD_REQUEST);
     }
   }
-  @UseGuards(AuthGuard)
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateStaffServiceDto: UpdateStaffServiceDto,
-  ) {
-    return this.staffServicesService.update(+id, updateStaffServiceDto);
-  }
+
   @UseGuards(AuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: number, @Res() res: Response) {

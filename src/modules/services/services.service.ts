@@ -147,10 +147,6 @@ export class ServicesService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} service`;
-  }
-
   async searchByName(name: string) {
     try {
       let service = await this.serviceRepository.find({

@@ -25,7 +25,16 @@ import { Response, query } from 'express';
 
 import { PaginationDto } from './dto/pagination-service.dto';
 import { AuthGuard } from '../auth/auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+class ResInterface {
+  @ApiProperty()
+  message: string;
+  @ApiProperty()
+  data: any;
+  @ApiProperty()
+  status: boolean;
+}
 
 @ApiTags('services')
 @Controller('services')
@@ -33,6 +42,9 @@ export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
   @UseGuards(AuthGuard)
   @Post()
+  @ApiResponse({
+    type: ResInterface,
+  })
   @UseInterceptors(FileInterceptor('avatar'))
   async create(
     @Res() res: Response,
@@ -58,6 +70,9 @@ export class ServicesController {
   }
 
   @Get()
+  @ApiResponse({
+    type: ResInterface,
+  })
   async findAll(
     @Res() res: Response,
     @Query('skip', ParseIntPipe) skip: number,
@@ -79,6 +94,9 @@ export class ServicesController {
   }
 
   @Get('search')
+  @ApiResponse({
+    type: ResInterface,
+  })
   async findAllService(@Res() res: Response, @Query('q') q: string) {
     if (q != undefined) {
       try {
@@ -102,6 +120,9 @@ export class ServicesController {
   }
   @UseGuards(AuthGuard)
   @Patch(':id')
+  @ApiResponse({
+    type: ResInterface,
+  })
   @UseInterceptors(FileInterceptor('avatar'))
   async update(
     @Res() res: Response,
@@ -153,13 +174,11 @@ export class ServicesController {
     }
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.servicesService.findOne(+id);
-  }
-
   @UseGuards(AuthGuard)
   @Delete(':id')
+  @ApiResponse({
+    type: ResInterface,
+  })
   async remove(@Param('id') id: number, @Res() res: Response) {
     try {
       let serviceRes = await this.servicesService.remove(id);
