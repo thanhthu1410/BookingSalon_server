@@ -21,7 +21,7 @@ import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
-import { uploadFileToStorage } from 'src/fb';
+import { uploadFileToStorage } from '../../fb';
 import { PaginationDto } from './dto/pagination-staff.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';

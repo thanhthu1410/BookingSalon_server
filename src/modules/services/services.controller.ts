@@ -20,7 +20,7 @@ import { ServicesService } from './services.service';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { uploadFileToStorage } from 'src/fb';
+import { uploadFileToStorage } from '../../fb';
 import { Response, query } from 'express';
 
 import { PaginationDto } from './dto/pagination-service.dto';
