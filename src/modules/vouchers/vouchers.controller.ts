@@ -12,13 +12,23 @@ import {
   HttpStatus,
   HttpException,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { VouchersService } from './vouchers.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { Response } from 'express';
 import { PaginationDto } from '../services/dto/pagination-service.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../auth/auth.guard';
+class ResInterface {
+  @ApiProperty()
+  message : string 
+  @ApiProperty()
+  data : any
+  @ApiProperty()
+  status: boolean
+}
 
 function generateRandomString(length: number) {
   const characters =
@@ -35,12 +45,51 @@ function generateRandomString(length: number) {
 @Controller('vouchers')
 export class VouchersController {
   constructor(private readonly vouchersService: VouchersService) {}
+  @UseGuards(AuthGuard) 
   @Post()
+  @ApiBody({
+    schema : {
+      type: "object" ,
+      properties: {
+        title : {
+          type:"string",
+        },
+        code : {
+          type:"string",
+        },
+        value : {
+          type:"number",
+        },
+        discountType : {
+          type:"string",
+        }
+        ,
+        startAt : {
+          type:"string",
+        }
+        ,
+        endAt : {
+          type:"string",
+        }
+      },
+      example : {
+        title : "Voucher of summer",
+        code:"abC3#f",
+        value : "10",
+        discountType: "percent",
+        startAt: "4/11/2023",
+        endAt: "10/11/2023"
+      }
+    }
+  })
+@ApiResponse({
+  type: ResInterface
+})
   async create(
     @Body() body: any,
     createVoucherDto: CreateVoucherDto,
     @Res() res: Response,
-  ) {
+  ): Promise<false | Response<any, Record<string, any>>> {
     let arrayVoucher = [];
     for (let i = 0; i < body.quantity; i++) {
       let createVoucher = generateRandomString(6);
@@ -65,6 +114,9 @@ export class VouchersController {
   }
 
   @Get('search')
+  @ApiResponse({
+    type: ResInterface
+  })
   async finMany(@Res() res: Response, @Query('search') search: string) {
     if (search != undefined) {
       try {
@@ -86,6 +138,9 @@ export class VouchersController {
   }
 
   @Get('getvoucher')
+  @ApiResponse({
+    type: ResInterface
+  })
   async getVoucher(@Res() res: Response, @Query('getvoucher') search: string) {
     try {
       if (this.getVoucher != undefined) {
@@ -97,6 +152,8 @@ export class VouchersController {
       throw new HttpException('loi controller', HttpStatus.BAD_REQUEST);
     }
   }
+
+  @UseGuards(AuthGuard) 
   @Get()
   async findAll(
     @Res() res: Response,
@@ -123,6 +180,8 @@ export class VouchersController {
     return this.vouchersService.findOne(+id);
   }
 
+  
+  @UseGuards(AuthGuard) 
   @Patch(':id')
   update(@Param('id') id: number, @Body() updateVoucherDto: UpdateVoucherDto) {
     return this.vouchersService.update(id, updateVoucherDto);
