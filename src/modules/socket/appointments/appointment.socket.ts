@@ -10,7 +10,7 @@ import { Repository } from "typeorm";
 import * as fs from 'fs';
 import * as ejs from 'ejs';
 import { MailService } from "src/modules/mail/mail.service";
-import { saveNotificationToFile } from "src/modules/methods/method";
+import { saveNotificationToFile } from "../../methods/method";
 
 interface ClientType {
     socket: Socket,
